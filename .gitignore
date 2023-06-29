@@ -50,5 +50,5 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
-*.png
-*.jpeg
+genshin_clock/resources/*.png
+genshin_clock/resources/*.jpeg
