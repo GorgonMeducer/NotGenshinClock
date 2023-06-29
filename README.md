@@ -22,7 +22,7 @@ The rest of the source code in this project adheres to the Apache 2.0 License.
 First, you need to clone the project to your local machine. You can do this by running the following command in your terminal:
 
 ```bash
-git clone --recursive https://github.com/GorgonMeducer/GenshinClock.git
+git clone --recursive https://github.com/GorgonMeducer/NotGenshinClock.git
 ```
 
 The `--recursive` option is used to clone all the submodules included in the project.
@@ -35,9 +35,9 @@ Next, you need to download and install LLVM. You **MUST** download the [latest w
 
 ### 3. Open the Project
 
-Finally, you need to open the project in VS Code. You can do this by choosing "Open Folder" from the File menu in VS Code, and then selecting the folder of the `GenshinClock` project that you cloned.
+Finally, you need to open the project in VS Code. You can do this by choosing "Open Folder" from the File menu in VS Code, and then selecting the folder of the `NotGenshinClock` project that you cloned.
 
-Now, you should be ready to start using the GenshinClock project. If you encounter any issues, feel free to ask for help.
+Now, you should be ready to start using the `NotGenshinClock` project. If you encounter any issues, feel free to ask for help.
 
 
 
