@@ -43,7 +43,7 @@ Unzip the package and copy it to your desired location.
 
 Finally, you need to open the project in VS Code. You can do this by choosing "**Open Folder**" from the File menu in VS Code, and then selecting the folder of the `NotGenshinClock` project that you cloned.
 
-In "**Run and Debug**" panel, you can build the project via "**build(gcc) and debug(gdb) x86(32)**". 
+In "**Run and Debug**" panel, you can run the project via "**build and run x86(32)**" or you can press "**F5**" to launch a debug session.
 
 ![BuildAndRun](./doc/pictures/build_and_run.png) 
 
