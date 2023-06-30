@@ -33,6 +33,8 @@ Next, you need to download and install LLVM. You **MUST** download the [latest w
 
 **NOTE**: During the installation of LLVM, make sure you choose the option to add LLVM to your PATH. After installation, you may need to restart your computer to ensure the new environment variable settings take effect.
 
+![InstallLLVMPathSetting](./doc/pictures/install_llvm_path.png) 
+
 ### 3. Open the Project
 
 Finally, you need to open the project in VS Code. You can do this by choosing "Open Folder" from the File menu in VS Code, and then selecting the folder of the `NotGenshinClock` project that you cloned.
