@@ -138,7 +138,7 @@ static void monitor_sdl_refr_core(void)
 {
     if(sdl_refr_qry != false)
     {
-        if (arm_2d_helper_is_time_out(1000/60)) 
+        if (arm_2d_helper_is_time_out(1000/59)) 
         {
             sdl_refr_qry = false;
             SDL_UpdateTexture(texture, NULL, tft_fb, VT_WIDTH * sizeof(uint32_t));
@@ -244,23 +244,22 @@ void lcd_flush(int32_t nMS)
     sdl_refr_qry = true;
 }
 
-#if 0
-void __disp_adapter0_request_async_flushing( 
-                                                    void *pTarget,
-                                                    bool bIsNewFrame,
-                                                    int16_t iX, 
-                                                    int16_t iY,
-                                                    int16_t iWidth,
-                                                    int16_t iHeight,
-                                                    const COLOUR_INT *pBuffer)
-{
-
-     VT_Fill_Multiple_Colors(iX, iY,iX+iWidth-1,iY+iHeight-1,(color_typedef*) pBuffer);
-     s_bRequestAsyncFlush = true;
-}
-#endif
-
 uint32_t SystemCoreClock=3600000000;
+
+#if defined(_POSIX_VERSION) || defined(HAS_CLOCK_GETTIME)
+int64_t arm_2d_helper_get_system_timestamp(void)
+{
+    struct timespec timestamp;
+    clock_gettime(CLOCK_MONOTONIC, &timestamp);
+
+    return 1000000ul * timestamp.tv_sec + timestamp.tv_nsec / 1000ul;
+}
+
+uint32_t arm_2d_helper_get_reference_clock_frequency(void)
+{
+    return 1000000ul;
+}
+#else
 
 int64_t arm_2d_helper_get_system_timestamp(void)
 {
@@ -269,8 +268,9 @@ int64_t arm_2d_helper_get_system_timestamp(void)
 
 uint32_t arm_2d_helper_get_reference_clock_frequency(void)
 {
-    return 1000;
+    return CLOCKS_PER_SEC;
 }
+#endif
 
 __attribute__((constructor))
 void VT_Init(void)

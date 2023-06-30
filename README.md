@@ -29,7 +29,7 @@ The `--recursive` option is used to clone all the submodules included in the pro
 
 ### 2. Install GCC (mingw32)
 
-Next, you need to download and install GCC. You **MUST** download the [latest mingw32](https://github.com/niXman/mingw-builds-binaries/releases/). For example [i686-13.1.0-release-win32-dwarf-ucrt-rt_v11-rev1.7z](https://github.com/niXman/mingw-builds-binaries/releases/download/13.1.0-rt_v11-rev1/i686-13.1.0-release-win32-dwarf-ucrt-rt_v11-rev1.7z)
+Next, you need to download and install GCC. You **MUST** download the [latest mingw32](https://github.com/niXman/mingw-builds-binaries/releases/). For example [i686-13.1.0-release-posix-dwarf-ucrt-rt_v11-rev1.7z](https://github.com/niXman/mingw-builds-binaries/releases/download/13.1.0-rt_v11-rev1/i686-13.1.0-release-posix-dwarf-ucrt-rt_v11-rev1.7z)
 
 Unzip the package and copy it to your desired location. 
 
@@ -46,6 +46,8 @@ Finally, you need to open the project in VS Code. You can do this by choosing "*
 In "**Run and Debug**" panel, you can run the project via "**build and run x86(32)**" or you can press "**F5**" to launch a debug session.
 
 ![BuildAndRun](./doc/pictures/build_and_run.png) 
+
+
 
 
 
