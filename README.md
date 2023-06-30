@@ -1,4 +1,4 @@
-# NotGenshin Clock (v0.5.0)
+# NotGenshin Clock (v0.6.0)
 A Genshin Impact style of clock face created with [arm-2d](https://github.com/ARM-software/Arm-2D)
 
 ![ClockFace](./doc/pictures/clock_face.png) 
@@ -27,20 +27,28 @@ git clone --recursive https://github.com/GorgonMeducer/NotGenshinClock.git
 
 The `--recursive` option is used to clone all the submodules included in the project.
 
-### 2. Install LLVM
+### 2. Install GCC (mingw32)
 
-Next, you need to download and install LLVM. You **MUST** download the [latest win32 version of LLVM](https://github.com/llvm/llvm-project/releases).
+Next, you need to download and install GCC. You **MUST** download the [latest mingw32](https://github.com/niXman/mingw-builds-binaries/releases/). For example [i686-13.1.0-release-win32-dwarf-ucrt-rt_v11-rev1.7z](https://github.com/niXman/mingw-builds-binaries/releases/download/13.1.0-rt_v11-rev1/i686-13.1.0-release-win32-dwarf-ucrt-rt_v11-rev1.7z)
 
-**NOTE**: During the installation of LLVM, make sure you choose the option to add LLVM to your PATH. After installation, you may need to restart your computer to ensure the new environment variable settings take effect.
+Unzip the package and copy it to your desired location. 
 
-![InstallLLVMPathSetting](./doc/pictures/install_llvm_path.png) 
+**NOTE**: Make sure you have correctly set the **PATH** variable in windows environment for GCC. After installation, you may need to restart your computer to ensure the new environment variable settings take effect.
+
+![PathforGCC](./doc/pictures/path_for_gcc.png) 
+
+
 
 ### 3. Open the Project
 
-Finally, you need to open the project in VS Code. You can do this by choosing "Open Folder" from the File menu in VS Code, and then selecting the folder of the `NotGenshinClock` project that you cloned.
+Finally, you need to open the project in VS Code. You can do this by choosing "**Open Folder**" from the File menu in VS Code, and then selecting the folder of the `NotGenshinClock` project that you cloned.
+
+In "**Run and Debug**" panel, you can build the project via "**build(gcc) and debug(gdb) x86(32)**". 
+
+![BuildAndRun](./doc/pictures/build_and_run.png) 
+
+
 
 Now, you should be ready to start using the `NotGenshinClock` project. If you encounter any issues, feel free to ask for help.
-
-
 
 Enjoy.
