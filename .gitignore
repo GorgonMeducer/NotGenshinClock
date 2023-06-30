@@ -21,7 +21,6 @@
 *.lo
 
 # Shared objects (inc. Windows DLLs)
-*.dll
 *.so
 *.so.*
 *.dylib
@@ -50,3 +49,4 @@ Mkfile.old
 dkms.conf
 genshin_clock/resources/*.png
 genshin_clock/resources/*.jpeg
+build/SDL2.dll
