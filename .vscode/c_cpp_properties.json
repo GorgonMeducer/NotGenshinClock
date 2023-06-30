@@ -22,10 +22,10 @@
                 "ARM_SECTION(x)=  ",
                 "__va_list=va_list"
             ],
-            "compilerPath": "Clang.exe",
+            "compilerPath": "gcc.exe",
             "cStandard": "gnu11",
             "cppStandard": "gnu++11",
-            "intelliSenseMode": "windows-clang-x86",
+            "intelliSenseMode": "windows-gcc-x86",
             "compilerArgs": [],
             "configurationProvider": "ms-vscode.makefile-tools"
         }
