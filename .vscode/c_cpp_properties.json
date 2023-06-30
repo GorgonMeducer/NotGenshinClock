@@ -26,9 +26,9 @@
             "cStandard": "gnu11",
             "cppStandard": "gnu++11",
             "intelliSenseMode": "windows-clang-x86",
-            "compilerArgs": [
-            ]
-        },
+            "compilerArgs": [],
+            "configurationProvider": "ms-vscode.makefile-tools"
+        }
     ],
     "version": 4
 }

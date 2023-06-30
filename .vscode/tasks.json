@@ -1,119 +1,23 @@
 {
+    "version": "2.0.0",
     "tasks": [
         {
+            "label": "Make",
+            "group": "build",
             "type": "shell",
-            "label": "copy32Dll",
-            "command":"${workspaceFolder}/sdl2/autoCopy32.bat",
+            "command": "make -j",
             "options": {
                 "cwd": "${workspaceFolder}"
-            },
+            }
         },
         {
-            "dependsOn":"copy32Dll",
-            "type": "cppbuild",
-            "label": "C/C++: gcc.exe build x86(32)",
-            "command": "gcc.exe",
-            "args": [
-                "-fdiagnostics-color=always",
-                "-DARM_SECTION(x)= ",
-                "-D__va_list=va_list",
-                "-g",
-                "-O1",
-                "-std=gnu11",
-                "${workspaceFolder}/*.c",
-                "${workspaceFolder}/platform/*.c",
-                "${workspaceFolder}/platform/math/*.c",
-                "${workspaceFolder}/genshin_clock/*.c",
-                "${workspaceFolder}/genshin_clock/resources/*.c",
-
-                "-L${workspaceFolder}/sdl2/32/lib/x86",
-                "-I${workspaceFolder}/sdl2/32/include/SDL2",
-                "-I${workspaceFolder}/platform/math",
-                "-I${workspaceFolder}/platform/math/dsp",
-                "-I${workspaceFolder}",
-                "-I${workspaceFolder}/platform",
-                "-I${workspaceFolder}/genshin_clock",
-
-                "-I${workspaceFolder}/Arm-2D/Library/Include",
-                "-I${workspaceFolder}/Arm-2D/Helper/Include",
-                "-I${workspaceFolder}/Arm-2D/examples/common/benchmark",
-                "-I${workspaceFolder}/Arm-2D/examples/common/controls",
-                "${workspaceFolder}/Arm-2D/Library/Source/*.c",
-                "${workspaceFolder}/Arm-2D/Helper/Source/*.c",
-                "${workspaceFolder}/Arm-2D/examples/common/controls/*.c",
-                "${workspaceFolder}/Arm-2D/examples/common/benchmark/*.c",
-                "${workspaceFolder}/Arm-2D/examples/common/asset/*.c",
-
-                "-lSDL2main",
-                "-lSDL2",
-                "-o",
-                "${workspaceFolder}/build/arm_2d.exe"
-            ],
+            "label": "Make Clean",
+            "group": "build",
+            "type": "shell",
+            "command": "make clean",
             "options": {
                 "cwd": "${workspaceFolder}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": false,
-            },
-            "detail": "Debugger generated task"
-        },
-        {
-            "dependsOn":"copy32Dll",
-            "type": "cppbuild",
-            "label": "C/C++: clang.exe build x86(32)",
-            "command": "clang.exe",
-            "args": [
-                "-fdiagnostics-color=always",
-                "-DARM_SECTION(x)= ",
-                "-D__va_list=va_list",
-                "-g",
-                "-O1",
-                "-std=gnu11",
-                "${workspaceFolder}/*.c",
-                "${workspaceFolder}/platform/*.c",
-                "${workspaceFolder}/platform/math/*.c",
-                "${workspaceFolder}/genshin_clock/*.c",
-                "${workspaceFolder}/genshin_clock/resources/*.c",
-
-                "-L${workspaceFolder}/sdl2/32/lib/x86",
-                "-I${workspaceFolder}/sdl2/32/include/SDL2",
-                "-I${workspaceFolder}/platform/math",
-                "-I${workspaceFolder}/platform/math/dsp",
-                "-I${workspaceFolder}",
-                "-I${workspaceFolder}/platform",
-                "-I${workspaceFolder}/genshin_clock",
-
-                "-I${workspaceFolder}/Arm-2D/Library/Include",
-                "-I${workspaceFolder}/Arm-2D/Helper/Include",
-                "-I${workspaceFolder}/Arm-2D/examples/common/benchmark",
-                "-I${workspaceFolder}/Arm-2D/examples/common/controls",
-                "${workspaceFolder}/Arm-2D/Library/Source/*.c",
-                "${workspaceFolder}/Arm-2D/Helper/Source/*.c",
-                "${workspaceFolder}/Arm-2D/examples/common/controls/*.c",
-                "${workspaceFolder}/Arm-2D/examples/common/benchmark/*.c",
-                "${workspaceFolder}/Arm-2D/examples/common/asset/*.c",
-
-                "-lSDL2main",
-                "-lSDL2",
-                "-o",
-                "${workspaceFolder}/build/arm_2d.exe"
-            ],
-            "options": {
-                "cwd": "${workspaceFolder}",
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true,
-            },
-            "detail": "Debugger generated task"
-        },
-    ],
-    "version": "2.0.0"
+            }
+        }
+    ]
 }
