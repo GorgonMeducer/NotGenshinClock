@@ -1,4 +1,4 @@
-# NotGenshin Clock (v0.6.0)
+# NotGenshin Clock (v0.7.0)
 A Genshin Impact style of clock face created with [arm-2d](https://github.com/ARM-software/Arm-2D)
 
 ![ClockFace](./doc/pictures/clock_face.png) 

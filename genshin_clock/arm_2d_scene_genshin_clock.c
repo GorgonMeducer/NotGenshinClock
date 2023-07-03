@@ -178,6 +178,13 @@ IMPL_PFB_ON_DRAW(__pfb_draw_clock_inner_panel)
 
                 arm_2d_fill_colour(&__inner_panel, NULL, GLCD_COLOR_BLACK);
 
+                dynamic_nebula_show(&this.tNebula,
+                                    &__inner_panel,
+                                    &__inner_panel_canvas,
+                                    GLCD_COLOR_WHITE,
+                                    255,
+                                    bIsNewFrame);
+
                 do {
                     static const arm_2d_location_t tSourceCentre = {110, 110};
                     static const arm_2d_location_t tTargetCentre = {150, 90};
@@ -285,8 +292,6 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_genshin_clock_handler)
 
 
         /* draw background */
-
-
         arm_using(arm_2d_region_t __background_canvas = __top_canvas) {
             if (bIsNewFrame) {
 
@@ -437,6 +442,22 @@ user_scene_genshin_clock_t *__arm_2d_scene_genshin_clock_init(
     arm_foreach(arm_2d_op_fill_cl_msk_opa_trans_t, this.tTransformOP, ptOP) {
         ARM_2D_OP_INIT(*ptOP);
     }
+
+    do {
+        dynamic_nebula_particle_t *ptParticles 
+            = (dynamic_nebula_particle_t *)malloc(sizeof(dynamic_nebula_particle_t) * 200);
+        assert(NULL != ptParticles);
+
+        dynamic_nebula_cfg_t tCFG = {
+            .fSpeed = 0.3f,
+            .iRadius = 110,
+            .hwVisibleRingWidth = 50,
+            .hwParticleCount = 200,
+            .ptParticles = ptParticles,
+        };
+
+        dynamic_nebula_init(&this.tNebula, &tCFG);
+    } while(0);
 
     arm_2d_scene_player_append_scenes(  ptDispAdapter, 
                                         &this.use_as__arm_2d_scene_t, 

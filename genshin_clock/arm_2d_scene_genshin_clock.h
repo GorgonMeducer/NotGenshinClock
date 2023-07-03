@@ -23,6 +23,7 @@
 #include "arm_2d.h"
 
 #include "arm_2d_helper_scene.h"
+#include "arm_extra_controls.h"
 
 #ifdef   __cplusplus
 extern "C" {
@@ -91,7 +92,7 @@ ARM_PRIVATE(
     /* place your private member here, following two are examples */
     int64_t lTimestamp[7];
     arm_2d_location_t tBackgroundOffset;
-
+    dynamic_nebula_t tNebula;
     bool bUserAllocated;
     
     arm_2d_op_fill_cl_msk_opa_trans_t tTransformOP[5];
