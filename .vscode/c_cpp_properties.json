@@ -4,7 +4,7 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/sdl2/32/include/SDL2",
+                "${workspaceFolder}/sdl2/32/include",
                 "${workspaceFolder}/genshin_clock",
                 "${workspaceFolder}/genshin_clock/resources",
                 "${workspaceFolder}/platform",
