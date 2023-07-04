@@ -93,6 +93,7 @@ ARM_PRIVATE(
     int64_t lTimestamp[7];
     arm_2d_location_t tBackgroundOffset;
     dynamic_nebula_t tNebula;
+    dynamic_nebula_particle_t tParticles[200];
     bool bUserAllocated;
     
     arm_2d_op_fill_cl_msk_opa_trans_t tTransformOP[5];

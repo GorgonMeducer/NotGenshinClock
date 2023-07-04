@@ -444,16 +444,13 @@ user_scene_genshin_clock_t *__arm_2d_scene_genshin_clock_init(
     }
 
     do {
-        dynamic_nebula_particle_t *ptParticles 
-            = (dynamic_nebula_particle_t *)malloc(sizeof(dynamic_nebula_particle_t) * 200);
-        assert(NULL != ptParticles);
 
         dynamic_nebula_cfg_t tCFG = {
             .fSpeed = 0.3f,
             .iRadius = 110,
             .hwVisibleRingWidth = 50,
-            .hwParticleCount = 200,
-            .ptParticles = ptParticles,
+            .hwParticleCount = dimof(this.tParticles),
+            .ptParticles = this.tParticles,
         };
 
         dynamic_nebula_init(&this.tNebula, &tCFG);
