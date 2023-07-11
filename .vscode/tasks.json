@@ -3,11 +3,18 @@
     "tasks": [
         {
             "label": "Make",
-            "group": "build",
+            "group": {
+                "kind": "build"
+                // ,"isDefault": true
+            },
             "type": "shell",
             "command": "make -j",
+            "windows":{
+                "command": "${workspaceFolder}/build.bat",
+            },
+            "problemMatcher": "$gcc",
             "options": {
-                "cwd": "${workspaceFolder}"
+                "cwd": "${workspaceFolder}",
             }
         },
         {
@@ -15,8 +22,11 @@
             "group": "build",
             "type": "shell",
             "command": "make clean",
+            "windows":{
+                "command": "${workspaceFolder}/clean.bat",
+            },
             "options": {
-                "cwd": "${workspaceFolder}"
+                "cwd": "${workspaceFolder}",
             }
         }
     ]
