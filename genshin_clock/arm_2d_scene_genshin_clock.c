@@ -448,7 +448,7 @@ user_scene_genshin_clock_t *__arm_2d_scene_genshin_clock_init(
         dynamic_nebula_cfg_t tCFG = {
             .fSpeed = 0.3f,
             .iRadius = 110,
-            .hwVisibleRingWidth = 50,
+            .iVisibleRingWidth = 50,
             .hwParticleCount = dimof(this.tParticles),
             .ptParticles = this.tParticles,
         };

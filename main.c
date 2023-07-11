@@ -77,6 +77,7 @@ int app_2d_main_thread (void *argument)
     arm_2d_scene_player_switch_to_next_scene(&DISP0_ADAPTER);
 #endif
 
+    while (1) {
         if (arm_fsm_rt_cpl == disp_adapter0_task()) {
             VT_sdl_flush(1);
         }
