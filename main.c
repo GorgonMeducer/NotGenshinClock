@@ -91,8 +91,6 @@ int main(int argc, char* argv[])
 {
     VT_init();
 
-    printf("\r\nArm-2D x86 Template\r\n");
-
     arm_irq_safe {
         arm_2d_init();
     }
