@@ -17,6 +17,7 @@
 
 /*============================ INCLUDES ======================================*/
 #include <stdio.h>
+#include "Virtual_TFT_Port.h"
 #include "arm_2d_helper.h"
 #include "arm_2d_scenes.h"
 #include "arm_2d_disp_adapters.h"
@@ -56,19 +57,13 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-extern void lcd_flush(int32_t nMS);
 
 /*----------------------------------------------------------------------------
   Main function
  *----------------------------------------------------------------------------*/
-int main (void) 
-{
-    arm_irq_safe {
-        arm_2d_init();
-    }
- 
-    disp_adapter0_init();
 
+int app_2d_main_thread (void *argument)
+{
 #ifdef RTE_Acceleration_Arm_2D_Extra_Benchmark
     arm_2d_run_benchmark();
 #else
@@ -82,11 +77,38 @@ int main (void)
     arm_2d_scene_player_switch_to_next_scene(&DISP0_ADAPTER);
 #endif
 
-    while (1) {
         if (arm_fsm_rt_cpl == disp_adapter0_task()) {
-            lcd_flush(1);
+            VT_sdl_flush(1);
         }
     }
+
+    return 0;
+}
+
+
+int main(int argc, char* argv[])
+{
+    VT_init();
+
+    printf("\r\nArm-2D x86 Template\r\n");
+
+    arm_irq_safe {
+        arm_2d_init();
+    }
+
+    disp_adapter0_init();
+
+    SDL_CreateThread(app_2d_main_thread, "arm-2d thread", NULL);
+
+    while (1) {
+        VT_sdl_refresh_task();
+        if(VT_is_request_quit()){
+            break;
+        }
+    }
+
+    VT_deinit();
+    return 0;
 }
 
 #if defined(__clang__)

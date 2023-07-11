@@ -51,3 +51,4 @@ genshin_clock/resources/*.png
 genshin_clock/resources/*.jpeg
 build/SDL2.dll
 *.co
+.DS_Store

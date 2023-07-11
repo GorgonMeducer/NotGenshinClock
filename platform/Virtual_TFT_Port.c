@@ -47,7 +47,13 @@ static bool left_button_is_down = false;
 static int16_t last_x = 0;
 static int16_t last_y = 0;
 
-
+extern void VT_Init(void);
+extern void VT_Fill_Single_Color(int32_t x1, int32_t y1, int32_t x2, int32_t y2, color_typedef color);
+extern void VT_Fill_Multiple_Colors(int32_t x1, int32_t y1, int32_t x2, int32_t y2, color_typedef * color_p);
+extern void VT_Set_Point(int32_t x, int32_t y, color_typedef color);
+extern color_typedef VT_Get_Point(int32_t x, int32_t y);
+extern void VT_Clear(color_typedef color);
+extern bool VT_Mouse_Get_Point(int16_t *x,int16_t *y);
 
 
 /*******************************************************************************
@@ -62,7 +68,7 @@ static int16_t last_y = 0;
  * @date     :2018.11.20
  * @details  :
 *******************************************************************************/
-bool VT_Mouse_Get_Point(int16_t *x,int16_t *y)
+bool VT_mouse_get_point(int16_t *x,int16_t *y)
 {
     *x=last_x;
     *y=last_y;
@@ -133,8 +139,7 @@ static void monitor_sdl_init(void)
     sdl_inited = true;
 }
 
-
-static void monitor_sdl_refr_core(void)
+void VT_sdl_refresh_task(void)
 {
     if(sdl_refr_qry != false)
     {
@@ -194,35 +199,17 @@ static void monitor_sdl_refr_core(void)
                 break;
         }
     }
-
-    /*Sleep some time*/
-    SDL_Delay(1);
 }
 
-static int monitor_sdl_refr_thread(void * param)
+bool VT_is_request_quit(void)
 {
-    (void)param;
+    return sdl_quit_qry;
+}
 
-    monitor_sdl_init();
-
-    /*Run until quit event not arrives*/
-    while(sdl_quit_qry == false) {
-        /*Refresh handling*/
-        monitor_sdl_refr_core();
-    }
-
+void VT_deinit(void)
+{
     monitor_sdl_clean_up();
     exit(0);
-
-    return 0;
-}
-
-
-
-uint32_t VT_timerCallback(uint32_t interval, void *param)
-{
-    //    llTimer_ticks(10);
-    return interval;
 }
 
 
@@ -233,18 +220,17 @@ int32_t Disp0_DrawBitmap(int16_t x,int16_t y,int16_t width,int16_t height,const 
     return 0;
 }
 
-void lcd_flush(int32_t nMS)
+void VT_sdl_flush(int32_t nMS)
 {
+    nMS = MAX(1, nMS);
     while(!sdl_refr_cpl) {
         SDL_Delay(nMS);
     }
     sdl_refr_cpl = false;
-
-    nMS = MAX(1, nMS);
     sdl_refr_qry = true;
 }
 
-#if defined(_POSIX_VERSION) || defined(CLOCK_MONOTONIC)
+#if defined(_POSIX_VERSION) || defined(CLOCK_MONOTONIC) || defined(__APPLE__)
 int64_t arm_2d_helper_get_system_timestamp(void)
 {
     struct timespec timestamp;
@@ -270,10 +256,10 @@ uint32_t arm_2d_helper_get_reference_clock_frequency(void)
 }
 #endif
 
-__attribute__((constructor))
-void VT_Init(void)
+void VT_init(void)
 {
-    SDL_CreateThread(monitor_sdl_refr_thread, "sdl_refr", NULL);
+    monitor_sdl_init();
+
     while(sdl_inited == false);
 }
 
@@ -299,8 +285,6 @@ void VT_Fill_Single_Color(int32_t x1, int32_t y1, int32_t x2, int32_t y2, color_
             tft_fb[y * VT_WIDTH + x] = 0xff000000|DEV_2_VT_RGB(color);
         }
     }
-
-    //sdl_refr_qry = true;
 }
 
 void VT_Fill_Multiple_Colors(int32_t x1, int32_t y1, int32_t x2, int32_t y2, color_typedef * color_p)
@@ -328,8 +312,6 @@ void VT_Fill_Multiple_Colors(int32_t x1, int32_t y1, int32_t x2, int32_t y2, col
 
         color_p += x2 - act_x2;
     }
-
-    //sdl_refr_qry = true;
 }
 
 void VT_Set_Point(int32_t x, int32_t y, color_typedef color)
@@ -341,8 +323,6 @@ void VT_Set_Point(int32_t x, int32_t y, color_typedef color)
     if(y > VT_HEIGHT - 1) return;
 
     tft_fb[y * VT_WIDTH + x] = 0xff000000|DEV_2_VT_RGB(color);
-
-    //sdl_refr_qry = true;
 }
 
 color_typedef VT_Get_Point(int32_t x, int32_t y)
@@ -356,7 +336,6 @@ color_typedef VT_Get_Point(int32_t x, int32_t y)
 
     color=tft_fb[y * VT_WIDTH + x] ;
 
-    //sdl_refr_qry = true;
     return VT_RGB_2_DEV(color);
 }
 
