@@ -304,6 +304,7 @@
 // }
 
 
+#if 0
 /**
   \brief   Reverse byte order (16 bit)
   \details Reverses the byte order within each halfword of a word. For example, 0x12345678 becomes 0x34127856.
@@ -321,7 +322,7 @@ __STATIC_FORCEINLINE uint32_t __REV16(uint32_t value)
     ret+=b;
     return ret;
 }
-
+#endif
 
 // /**
 //   \brief   Reverse byte order (16 bit)
