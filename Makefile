@@ -3,6 +3,7 @@ CC_SRC  := $(wildcard *.c)
 CC_SRC  += $(wildcard platform/*.c)
 CC_SRC  += $(wildcard platform/math/*.c)
 CC_SRC  += $(wildcard genshin_clock/*.c)
+CC_SRC  += $(wildcard demos/*.c)
 CC_SRC  += $(wildcard genshin_clock/resources/*.c)
 CC_SRC  += $(wildcard Arm-2D/Library/Source/*.c)
 CC_SRC  += $(wildcard Arm-2D/Helper/Source/*.c)
@@ -12,6 +13,7 @@ CC_SRC  += $(wildcard Arm-2D/examples/common/controls/*.c)
 
 CC_INC  := .
 CC_INC  += genshin_clock
+CC_INC  += demos
 CC_INC  += platform
 CC_INC  += platform/math
 CC_INC  += platform/math/dsp

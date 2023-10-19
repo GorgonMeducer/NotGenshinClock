@@ -8,6 +8,10 @@
 		"files.associations": {
 			"cmsis_gcc.h": "c"
 		},
-		"sarif-viewer.connectToGithubCodeScanning": "off"
+		"sarif-viewer.connectToGithubCodeScanning": "off",
+		"cSpell.words": [
+			"CMSIS",
+			"halfword"
+		]
 	}
 }

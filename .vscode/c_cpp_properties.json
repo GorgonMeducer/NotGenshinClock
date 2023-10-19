@@ -6,6 +6,7 @@
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/sdl2/32/include",
                 "${workspaceFolder}/genshin_clock",
+                "${workspaceFolder}/demos",
                 "${workspaceFolder}/genshin_clock/resources",
                 "${workspaceFolder}/platform",
                 "${workspaceFolder}/platform/math",
