@@ -1,16 +1,5 @@
-# NotGenshin Clock (v0.8.1)
-This is a Genshin Impact-style clock face created with [arm-2d](https://github.com/ARM-software/Arm-2D). **You can use this project as a template for arm-2d development on PC (e.g. Windows, Linux and MacOS).**
-
-![ClockFace](./doc/pictures/clock_face.png) 
-
-### Disclaimer:
-
-Apart from the background image, which is derived from a game screenshot, this open-source project does not directly utilize any resource files from Genshin Impact. All materials necessary for the clock face were created by myself, yet unavoidably reference the original design of Genshin Impact. The copyright for these designs belongs to the original game company. 
-
-The image materials involved in this open-source project that is, the converted pixel array source code files (stored in the `genshin_clock/resources` directory), are **NOT** to be used for any commercial purposes and are solely for open-source and learning purposes. This rule supersedes the Apache 2.0 License that this project uses. 
-
-The rest of the source code in this project adheres to the Apache 2.0 License.
-
+# Arm-2D Demo for Events
+This is a GUI demo created with [arm-2d](https://github.com/ARM-software/Arm-2D). **You can use this project as a template for arm-2d development on PC (e.g. Windows, Linux and MacOS).**
 
 
 ## How to Build
@@ -24,10 +13,11 @@ This example project currently support Windows, Linux and MacOS. Please follow t
 First, please clone the project to your local machine. You can do this by running the following command in your terminal:
 
 ```bash
-git clone --recursive https://github.com/GorgonMeducer/NotGenshinClock.git
+git clone -b Demo-for-Events-2023 --recursive https://github.com/GorgonMeducer/NotGenshinClock.git
 ```
 
 The `--recursive` option is used to clone all the submodules included in the project.
+
 
 #### 1.2 Install GCC (mingw32) and Make
 
@@ -59,7 +49,7 @@ In "**Run and Debug**" panel, you can run the project via "**build and run x86(3
 First, please clone the project to your local machine. You can do this by running the following command in your terminal:
 
 ```bash
-git clone --recursive https://github.com/GorgonMeducer/NotGenshinClock.git
+git clone -b Demo-for-Events-2023 --recursive https://github.com/GorgonMeducer/NotGenshinClock.git
 ```
 
 The `--recursive` option is used to clone all the submodules included in the project.
@@ -93,7 +83,7 @@ In "**Run and Debug**" panel, you can run the project via "**build and run x86(3
 First, please clone the project to your local machine. You can do this by running the following command in your terminal:
 
 ```bash
-git clone --recursive https://github.com/GorgonMeducer/NotGenshinClock.git
+git clone -b Demo-for-Events-2023 --recursive https://github.com/GorgonMeducer/NotGenshinClock.git
 ```
 
 The `--recursive` option is used to clone all the submodules included in the project.
