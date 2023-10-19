@@ -34,7 +34,7 @@ Second, please
 
 #### 1.3 Open the Project
 
-Finally, please open the project in VS Code. You can do this by choosing "**Open Workspace from File**"  in the File menu in VS Code and then selecting the workspace file `NotGenshinClock.code-workspace` in the `NotGenshinClock` folder that you have just cloned.
+Finally, please open the project in VS Code. You can do this by choosing "**Open Workspace from File**"  in the File menu in VS Code and then selecting the workspace file `Application.code-workspace` in the `NotGenshinClock` folder that you have just cloned.
 
 In "**Run and Debug**" panel, you can run the project via "**build and run x86(32)**" or you can press "**F5**" to launch a debug session.
 
@@ -68,7 +68,7 @@ sudo apt-get update && sudo apt-get install -y build-essential libsdl2-dev
 
 #### 2.3 Open the Project
 
-Finally, please open the project in VS Code. You can do this by choosing "**Open Workspace from File**"  in the File menu in VS Code and then selecting the workspace file `NotGenshinClock.code-workspace` in the `NotGenshinClock` folder that you have just cloned.
+Finally, please open the project in VS Code. You can do this by choosing "**Open Workspace from File**"  in the File menu in VS Code and then selecting the workspace file `Application.code-workspace` in the `NotGenshinClock` folder that you have just cloned.
 
 In "**Run and Debug**" panel, you can run the project via "**build and run x86(32)**" or you can press "**F5**" to launch a debug session.
 
@@ -118,7 +118,7 @@ brew install sdl2
 
 #### 3.3 Open the Project
 
-Finally, please open the project in VS Code. You can do this by choosing "**Open Workspace from File**"  in the File menu in VS Code and then selecting the workspace file `NotGenshinClock.code-workspace` in the `NotGenshinClock` folder that you have just cloned.
+Finally, please open the project in VS Code. You can do this by choosing "**Open Workspace from File**"  in the File menu in VS Code and then selecting the workspace file `Application.code-workspace` in the `NotGenshinClock` folder that you have just cloned.
 
 In "**Run and Debug**" panel, you can run the project via "**build and run on macos (lldb)**" or you can press "**F5**" to launch a debug session.
 

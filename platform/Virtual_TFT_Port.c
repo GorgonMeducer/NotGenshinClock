@@ -103,8 +103,7 @@ static void monitor_sdl_init(void)
     SDL_SetEventFilter(quit_filter, NULL);
 
     window = SDL_CreateWindow(  
-                                "NotGenshin Clock(v0.8.0)"
-                                "                                               - Created with Arm-2D v" 
+                                "Arm-2D v" 
                                 ARM_TO_STRING(ARM_2D_VERSION_MAJOR)
                                 "."
                                 ARM_TO_STRING(ARM_2D_VERSION_MINOR)
@@ -143,7 +142,7 @@ void VT_sdl_refresh_task(void)
 {
     if(sdl_refr_qry != false)
     {
-        if (arm_2d_helper_is_time_out(1000/60)) 
+        if (arm_2d_helper_is_time_out(1000/30)) 
         {
             sdl_refr_qry = false;
             SDL_UpdateTexture(texture, NULL, tft_fb, VT_WIDTH * sizeof(uint32_t));
