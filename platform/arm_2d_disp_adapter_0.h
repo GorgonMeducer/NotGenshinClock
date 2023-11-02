@@ -70,7 +70,7 @@ extern "C" {
 // <o>Width of the PFB block
 // <i> The width of your PFB block size used in disp0
 #ifndef __DISP0_CFG_PFB_BLOCK_WIDTH__
-#   define __DISP0_CFG_PFB_BLOCK_WIDTH__                           480
+#   define __DISP0_CFG_PFB_BLOCK_WIDTH__                           __DISP0_CFG_SCEEN_WIDTH__
 #endif
 
 // <o>Height of the PFB block
@@ -145,6 +145,7 @@ extern "C" {
 #   define __DISP0_CFG_ENABLE_ASYNC_FLUSHING__                     0
 #endif
 
+// <q>Enable the helper service for 3FB (LCD Direct Mode)
 // <i> You can select this option when your LCD controller supports direct mode
 #ifndef __DISP0_CFG_ENABLE_3FB_HELPER_SERVICE__
 #   define __DISP0_CFG_ENABLE_3FB_HELPER_SERVICE__                 0
@@ -287,6 +288,8 @@ void __disp_adapter0_vres_read_memory( intptr_t pObj,
 #endif
 
 #if __DISP0_CFG_ENABLE_ASYNC_FLUSHING__
+
+#   if __DISP0_CFG_ENABLE_3FB_HELPER_SERVICE__
 
 /*!
  * \brief An user implemented interface for DMA memory-to-memory copy.
