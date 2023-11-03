@@ -158,7 +158,7 @@ static void __on_scene_fitness_frame_complete(arm_2d_scene_t *ptScene)
             this.lTimestamp[3] = 0;
         }
 
-        this.iProgress = nResult;
+        this.iProgress = (int16_t)nResult;
     } while(0);
 
 
@@ -237,6 +237,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_fitness_handler)
                 }
             }
         }
+
         /* draw text at the top-left corner */
 
         arm_lcd_text_set_target_framebuffer((arm_2d_tile_t *)ptTile);
@@ -287,22 +288,8 @@ user_scene_fitness_t *__arm_2d_scene_fitness_init(   arm_2d_scene_player_t *ptDi
     IMPL_ARM_2D_REGION_LIST(s_tDirtyRegions, static)
 
         /* a dirty region to be specified at runtime*/
-        ADD_REGION_TO_LIST(s_tDirtyRegions,
-            0  /* initialize at runtime later */
-        ),
-        
-        /* add the last region:
-         * it is the top left corner for text display 
-         */
         ADD_LAST_REGION_TO_LIST(s_tDirtyRegions,
-            .tLocation = {
-                .iX = 0,
-                .iY = 0,
-            },
-            .tSize = {
-                .iWidth = 0,
-                .iHeight = 8,
-            },
+            0  /* initialize at runtime later */
         ),
 
     END_IMPL_ARM_2D_REGION_LIST(s_tDirtyRegions)
@@ -321,30 +308,13 @@ user_scene_fitness_t *__arm_2d_scene_fitness_init(   arm_2d_scene_player_t *ptDi
     arm_2d_align_centre(tScreen, 240, 240) {
         s_tDirtyRegions[0].tRegion = __centre_region;
     }
-
-    s_tDirtyRegions[dimof(s_tDirtyRegions)-1].tRegion.tSize.iWidth 
-                                                        = tScreen.tSize.iWidth;
 #else
     /*! define dirty regions */
     IMPL_ARM_2D_REGION_LIST(s_tDirtyRegions, static)
 
         /* a dirty region to be specified at runtime*/
-        ADD_REGION_TO_LIST(s_tDirtyRegions,
-            0  /* initialize at runtime later */
-        ),
-        
-        /* add the last region:
-         * it is the top left corner for text display 
-         */
         ADD_LAST_REGION_TO_LIST(s_tDirtyRegions,
-            .tLocation = {
-                .iX = 0,
-                .iY = 0,
-            },
-            .tSize = {
-                .iWidth = 0,
-                .iHeight = 8,
-            },
+            0  /* initialize at runtime later */
         ),
 
     END_IMPL_ARM_2D_REGION_LIST(s_tDirtyRegions)
@@ -364,8 +334,6 @@ user_scene_fitness_t *__arm_2d_scene_fitness_init(   arm_2d_scene_player_t *ptDi
         s_tDirtyRegions[0].tRegion = __centre_region;
     }
 
-    s_tDirtyRegions[dimof(s_tDirtyRegions)-1].tRegion.tSize.iWidth 
-                                                        = tScreen.tSize.iWidth;
 #endif
 
     if (NULL == ptThis) {
