@@ -152,7 +152,7 @@ static void __on_scene_fitness_frame_complete(arm_2d_scene_t *ptScene)
         int32_t nResult;
         if (arm_2d_helper_time_liner_slider(0, 
                                             1000, 
-                                            15000, 
+                                            10000, 
                                             &nResult, 
                                             &this.lTimestamp[3])) {
             this.lTimestamp[3] = 0;
@@ -162,8 +162,8 @@ static void __on_scene_fitness_frame_complete(arm_2d_scene_t *ptScene)
     } while(0);
 
 
-    /* switch to next scene after 20s */
-    if (arm_2d_helper_is_time_out(20000, &this.lTimestamp[4])) {
+    /* switch to next scene after 8s */
+    if (arm_2d_helper_is_time_out(8000, &this.lTimestamp[4])) {
         arm_2d_scene_player_switch_to_next_scene(ptScene->ptPlayer);
     }
 }
