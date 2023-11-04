@@ -106,6 +106,10 @@ struct {
     arm_2d_char_idx_t tUTF8Table;
 } ARM_2D_FONT_ARIAL16_A4;
 
+extern const arm_2d_tile_t c_tileInnerGearMask;
+extern const arm_2d_tile_t c_tileInnerGearMidMask;
+extern const arm_2d_tile_t c_tileGenshinPointerMask;
+
 /*============================ PROTOTYPES ====================================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
@@ -146,6 +150,10 @@ static void __on_scene_audiomark_depose(arm_2d_scene_t *ptScene)
     
     arm_foreach(int64_t,this.lTimestamp, ptItem) {
         *ptItem = 0;
+    }
+
+    arm_foreach(arm_2d_op_fill_cl_msk_opa_trans_t, this.tTransformOP, ptOP) {
+        ARM_2D_OP_DEPOSE(*ptOP);
     }
 
     for (int_fast8_t n = 0; n < dimof(this.Processor); n ++) {
@@ -276,16 +284,66 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_audiomark_handler)
     user_scene_audiomark_t *ptThis = (user_scene_audiomark_t *)pTarget;
     arm_2d_size_t tScreenSize = ptTile->tRegion.tSize;
 
+    int32_t iResult;
+    float fAngle;
+
     ARM_2D_UNUSED(ptTile);
     ARM_2D_UNUSED(bIsNewFrame);
     ARM_2D_UNUSED(tScreenSize);
-    
     arm_2d_canvas(ptTile, __top_canvas) {
     /*-----------------------draw the foreground begin-----------------------*/
         
         /* following code is just a demo, you can remove them */
         
         arm_2d_fill_colour(ptTile, NULL, GLCD_COLOR_BLACK);
+
+        do {
+            static const arm_2d_location_t tSourceCentre = {110, 110};
+            arm_2d_location_t tTargetCentre = { (tScreenSize.iWidth >> 1) + 150, 
+                                                tScreenSize.iHeight >> 2};
+
+            if (arm_2d_helper_time_liner_slider(0, 3600, 50 * 1000, &iResult, &this.lTimestamp[1])) {
+                this.lTimestamp[1] = 0;
+            }
+            fAngle = ARM_2D_ANGLE((float)iResult / 10.0f);
+
+            arm_2dp_fill_colour_with_mask_opacity_and_transform(&this.tTransformOP[0],
+                                                                &c_tileInnerGearMask,
+                                                                ptTile,
+                                                                &__top_canvas,
+                                                                tSourceCentre,
+                                                                fAngle,
+                                                                1.5f,
+                                                                GLCD_COLOR_OLIVE,
+                                                                180,
+                                                                &tTargetCentre);
+            arm_2d_op_wait_async((arm_2d_op_core_t *)&this.tTransformOP[0]);
+        } while(0);
+
+        do {
+            static const arm_2d_location_t tSourceCentre = {90, 90};
+            arm_2d_location_t tTargetCentre = { (tScreenSize.iWidth >> 1) + 100, 
+                                                (tScreenSize.iHeight >> 2) + 60};
+
+            if (arm_2d_helper_time_liner_slider(0, 3600,13 * 1000, &iResult, &this.lTimestamp[2])) {
+                this.lTimestamp[2] = 0;
+            }
+            fAngle = ARM_2D_ANGLE((float)iResult / 10.0f);
+
+            arm_2dp_fill_colour_with_mask_opacity_and_transform(&this.tTransformOP[1],
+                                                                &c_tileInnerGearMidMask,
+                                                                ptTile,
+                                                                &__top_canvas,
+                                                                tSourceCentre,
+                                                                fAngle,
+                                                                0.5f,
+                                                                GLCD_COLOR_OLIVE,
+                                                                200,
+                                                                &tTargetCentre);
+
+            arm_2d_op_wait_async((arm_2d_op_core_t *)&this.tTransformOP[1]);
+        } while(0);
+
 
         arm_2d_align_top_centre(__top_canvas, tScreenSize.iWidth, tScreenSize.iHeight >> 1) {
         
@@ -465,6 +523,10 @@ user_scene_audiomark_t *__arm_2d_scene_audiomark_init(   arm_2d_scene_player_t *
                             c_tProcessorInfo[n].tColour);
         this.Processor[n].pchName = c_tProcessorInfo[n].pchName;
         this.Processor[n].iProgress = 0;
+    }
+
+    arm_foreach(arm_2d_op_fill_cl_msk_opa_trans_t, this.tTransformOP, ptOP) {
+        ARM_2D_OP_INIT(*ptOP);
     }
 
 #if __FITNESS_CFG_NEBULA_ENABLE__

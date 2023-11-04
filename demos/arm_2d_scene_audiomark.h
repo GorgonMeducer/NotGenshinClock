@@ -97,13 +97,15 @@ struct user_scene_audiomark_t {
 
 ARM_PRIVATE(
     /* place your private member here, following two are examples */
-    int64_t lTimestamp[1];
+    int64_t lTimestamp[3];
     bool bUserAllocated;
-    
+
 #if __FITNESS_CFG_NEBULA_ENABLE__
     dynamic_nebula_t tNebula;
     dynamic_nebula_particle_t tParticles[NEBULA_PARTICLE_COUNT];
 #endif
+
+    arm_2d_op_fill_cl_msk_opa_trans_t tTransformOP[2];
 
     struct {
         progress_wheel_t tWheel;
