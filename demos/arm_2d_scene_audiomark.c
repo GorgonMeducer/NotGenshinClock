@@ -317,7 +317,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_audiomark_handler)
                                                                 GLCD_COLOR_OLIVE,
                                                                 180,
                                                                 &tTargetCentre);
-            arm_2d_op_wait_async((arm_2d_op_core_t *)&this.tTransformOP[0]);
+            ARM_2D_OP_WAIT_ASYNC(&this.tTransformOP[0]);
         } while(0);
 
         do {
@@ -341,7 +341,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_audiomark_handler)
                                                                 200,
                                                                 &tTargetCentre);
 
-            arm_2d_op_wait_async((arm_2d_op_core_t *)&this.tTransformOP[1]);
+            ARM_2D_OP_WAIT_ASYNC(&this.tTransformOP[1]);
         } while(0);
 
 
@@ -429,7 +429,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_audiomark_handler)
 
     /*-----------------------draw the foreground end  -----------------------*/
     }
-    arm_2d_op_wait_async(NULL);
+    ARM_2D_OP_WAIT_ASYNC();
 
     return arm_fsm_rt_cpl;
 }
