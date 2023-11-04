@@ -411,7 +411,7 @@ IMPL_FONT_GET_CHAR_DESCRIPTOR(__utf8_a1_font_get_char_descriptor)
 struct {
     implement(arm_2d_user_font_t);
     arm_2d_char_idx_t tUTF8Table;
-} ARM_2D_FONT_ARIAL_A1 = {
+} ARM_2D_FONT_ARIAL32_A1 = {
 
     .use_as__arm_2d_user_font_t = {
         .use_as__arm_2d_font_t = {
@@ -933,7 +933,7 @@ IMPL_FONT_GET_CHAR_DESCRIPTOR(__utf8_a2_font_get_char_descriptor)
 struct {
     implement(arm_2d_user_font_t);
     arm_2d_char_idx_t tUTF8Table;
-} ARM_2D_FONT_ARIAL_A2 = {
+} ARM_2D_FONT_ARIAL32_A2 = {
 
     .use_as__arm_2d_user_font_t = {
         .use_as__arm_2d_font_t = {
@@ -1681,7 +1681,7 @@ IMPL_FONT_GET_CHAR_DESCRIPTOR(__utf8_a4_font_get_char_descriptor)
 struct {
     implement(arm_2d_user_font_t);
     arm_2d_char_idx_t tUTF8Table;
-} ARM_2D_FONT_ARIAL_A4 = {
+} ARM_2D_FONT_ARIAL32_A4 = {
 
     .use_as__arm_2d_user_font_t = {
         .use_as__arm_2d_font_t = {
@@ -2848,7 +2848,7 @@ IMPL_FONT_GET_CHAR_DESCRIPTOR(__utf8_a8_font_get_char_descriptor)
 struct {
     implement(arm_2d_user_font_t);
     arm_2d_char_idx_t tUTF8Table;
-} ARM_2D_FONT_ARIAL_A8 = {
+} ARM_2D_FONT_ARIAL32_A8 = {
 
     .use_as__arm_2d_user_font_t = {
         .use_as__arm_2d_font_t = {
