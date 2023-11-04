@@ -88,6 +88,22 @@ extern const arm_2d_tile_t c_tileCMSISLogoA2Mask;
 extern const arm_2d_tile_t c_tileCMSISLogoA4Mask;
 /*============================ PROTOTYPES ====================================*/
 /*============================ LOCAL VARIABLES ===============================*/
+
+static const struct {
+    const char  *chName;
+    int16_t     iWheelSize;
+    int16_t     iAudioMark;
+    COLOUR_INT  tWheelColour;
+    uint8_t     chOpacity;
+} c_tProcessorInfo[] = {
+    [AUDIOMARK_CORTEX_M4]           = { "Cortex-M4",           100 + 75 * 0,    73,     GLCD_COLOR_LIGHT_GREY,  128         },
+    [AUDIOMARK_CORTEX_M33]          = { "Cortex-M33",           65 + 75 * 1,    101,    GLCD_COLOR_LIGHT_GREY,  128         },
+    [AUDIOMARK_CORTEX_M7]           = { "Cortex-M7",            35 + 75 * 2,    132,    GLCD_COLOR_LIGHT_GREY,  255         },
+    [AUDIOMARK_CORTEX_M85_SCALER]   = { "Cortex-M85 Scaler",    20 + 75 * 3,    201,    GLCD_COLOR_GREEN,       128,        },
+    [AUDIOMARK_CORTEX_M55_HELIUM]   = { "Cortex-M55 Helium",    20 + 75 * 4,    367,    GLCD_COLOR_GREEN,       256 - 64,   },
+    [AUDIOMARK_CORTEX_M85_HELIUM]   = { "Cortex-M85 Helium",    40 + 75 * 5,    423,    GLCD_COLOR_GREEN,       255,        },
+};
+
 /*============================ IMPLEMENTATION ================================*/
 
 
@@ -100,6 +116,11 @@ static void __on_scene_audiomark_depose(arm_2d_scene_t *ptScene)
     
     arm_foreach(int64_t,this.lTimestamp, ptItem) {
         *ptItem = 0;
+    }
+
+    for (int_fast8_t n = 0; n < dimof(this.Processor); n ++) {
+        progress_wheel_depose(&this.Processor[n].tWheel);
+        this.Processor[n].lTimestamp = 0;
     }
 
     if (!this.bUserAllocated) {
@@ -131,6 +152,22 @@ static void __on_scene_audiomark_frame_start(arm_2d_scene_t *ptScene)
     user_scene_audiomark_t *ptThis = (user_scene_audiomark_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
 
+    for (int_fast8_t n = 0; n < dimof(this.Processor); n++) {
+        
+        int32_t nResult;
+        if (arm_2d_helper_time_liner_slider(0, 
+                                            1000, 
+                                            5000ul * 100ul / (int32_t)c_tProcessorInfo[n].iAudioMark , 
+                                            &nResult, 
+                                            &this.Processor[n].lTimestamp)) {
+            this.Processor[n].lTimestamp = 0;
+        }
+
+        this.Processor[n].iProgress = (int16_t)nResult;
+    }
+
+
+
 }
 
 static void __on_scene_audiomark_frame_complete(arm_2d_scene_t *ptScene)
@@ -140,7 +177,7 @@ static void __on_scene_audiomark_frame_complete(arm_2d_scene_t *ptScene)
     
     /* switch to next scene after 3s */
     if (arm_2d_helper_is_time_out(3000, &this.lTimestamp[0])) {
-        arm_2d_scene_player_switch_to_next_scene(ptScene->ptPlayer);
+        //arm_2d_scene_player_switch_to_next_scene(ptScene->ptPlayer);
     }
 }
 
@@ -155,16 +192,36 @@ static
 IMPL_PFB_ON_DRAW(__pfb_draw_scene_audiomark_handler)
 {
     user_scene_audiomark_t *ptThis = (user_scene_audiomark_t *)pTarget;
+    arm_2d_size_t tScreenSize = ptTile->tRegion.tSize;
+
     ARM_2D_UNUSED(ptTile);
     ARM_2D_UNUSED(bIsNewFrame);
+    ARM_2D_UNUSED(tScreenSize);
     
     arm_2d_canvas(ptTile, __top_canvas) {
     /*-----------------------draw the foreground begin-----------------------*/
         
         /* following code is just a demo, you can remove them */
         
-        arm_2d_fill_colour(ptTile, NULL, GLCD_COLOR_WHITE);
+        arm_2d_fill_colour(ptTile, NULL, GLCD_COLOR_BLACK);
 
+        
+        arm_2d_align_bottom_centre(__top_canvas, tScreenSize.iWidth, tScreenSize.iHeight >> 1) {
+            
+            for (int_fast8_t n = 0; n < dimof(this.Processor); n++) {
+
+                progress_wheel_show(&this.Processor[n].tWheel,
+                    ptTile, 
+                    &__bottom_centre_region,       
+                    this.Processor[n].iProgress,
+                    c_tProcessorInfo[n].chOpacity,
+                    bIsNewFrame);
+                arm_2d_op_wait_async(NULL);
+            }
+
+            arm_2d_op_wait_async(NULL);
+        }
+#if 0
         arm_2d_align_centre(__top_canvas, 200, 100 ) {
             draw_round_corner_box(  ptTile, 
                                     &__centre_region, 
@@ -185,36 +242,14 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_audiomark_handler)
         }
 
 
-    #if 0
-        /* draw the cmsis logo in the centre of the screen */
-        arm_2d_align_centre(__top_canvas, c_tileCMSISLogo.tRegion.tSize) {
-            arm_2d_tile_copy_with_src_mask( &c_tileCMSISLogo,
-                                            &c_tileCMSISLogoMask,
-                                            ptTile,
-                                            &__centre_region,
-                                            ARM_2D_CP_MODE_COPY);
-        }
-    #else
-        /* draw the cmsis logo using mask in the centre of the screen */
-        arm_2d_align_centre(__top_canvas, c_tileCMSISLogo.tRegion.tSize) {
-            arm_2d_fill_colour_with_a4_mask_and_opacity(   
-                                                ptTile, 
-                                                &__centre_region, 
-                                                &c_tileCMSISLogoA4Mask, 
-                                                (__arm_2d_color_t){GLCD_COLOR_BLACK},
-                                                128);
-        }
-    #endif
-
         /* draw text at the top-left corner */
-
         arm_lcd_text_set_target_framebuffer((arm_2d_tile_t *)ptTile);
         arm_lcd_text_set_font(&ARM_2D_FONT_6x8.use_as__arm_2d_font_t);
         arm_lcd_text_set_draw_region(NULL);
         arm_lcd_text_set_colour(GLCD_COLOR_RED, GLCD_COLOR_WHITE);
         arm_lcd_text_location(0,0);
         arm_lcd_puts("Scene audiomark");
-
+#endif
     /*-----------------------draw the foreground end  -----------------------*/
     }
     arm_2d_op_wait_async(NULL);
@@ -229,6 +264,7 @@ user_scene_audiomark_t *__arm_2d_scene_audiomark_init(   arm_2d_scene_player_t *
     bool bUserAllocated = false;
     assert(NULL != ptDispAdapter);
 
+#if 0
     /*! define dirty regions */
     IMPL_ARM_2D_REGION_LIST(s_tDirtyRegions, static)
 
@@ -270,6 +306,7 @@ user_scene_audiomark_t *__arm_2d_scene_audiomark_init(   arm_2d_scene_player_t *
 
     s_tDirtyRegions[dimof(s_tDirtyRegions)-1].tRegion.tSize.iWidth 
                                                         = tScreen.tSize.iWidth;
+#endif
 
     if (NULL == ptThis) {
         ptThis = (user_scene_audiomark_t *)malloc(sizeof(user_scene_audiomark_t));
@@ -288,7 +325,7 @@ user_scene_audiomark_t *__arm_2d_scene_audiomark_init(   arm_2d_scene_player_t *
             /* Please uncommon the callbacks if you need them
              */
             .fnScene        = &__pfb_draw_scene_audiomark_handler,
-            .ptDirtyRegion  = (arm_2d_region_list_item_t *)s_tDirtyRegions,
+            //.ptDirtyRegion  = (arm_2d_region_list_item_t *)s_tDirtyRegions,
             
 
             //.fnOnBGStart    = &__on_scene_audiomark_background_start,
@@ -303,6 +340,12 @@ user_scene_audiomark_t *__arm_2d_scene_audiomark_init(   arm_2d_scene_player_t *
 
     /* ------------   initialize members of user_scene_audiomark_t begin ---------------*/
 
+    for (uint_fast8_t n = 0; n < dimof(this.Processor); n++) {
+        progress_wheel_init(&this.Processor[n].tWheel, 
+                            c_tProcessorInfo[n].iWheelSize, 
+                            c_tProcessorInfo[n].tWheelColour);
+        this.Processor[n].iProgress = 0;
+    }
 
     /* ------------   initialize members of user_scene_audiomark_t end   ---------------*/
 

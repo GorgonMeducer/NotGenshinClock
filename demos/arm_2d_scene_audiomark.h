@@ -24,6 +24,7 @@
 #include "arm_2d.h"
 
 #include "arm_2d_helper_scene.h"
+#include "arm_extra_controls.h"
 
 #ifdef   __cplusplus
 extern "C" {
@@ -67,6 +68,16 @@ extern "C" {
             __arm_2d_scene_audiomark_init((__DISP_ADAPTER_PTR), (NULL, ##__VA_ARGS__))
 
 /*============================ TYPES =========================================*/
+enum {
+    AUDIOMARK_CORTEX_M4,
+    AUDIOMARK_CORTEX_M33,
+    AUDIOMARK_CORTEX_M7,
+    AUDIOMARK_CORTEX_M85_SCALER,
+    AUDIOMARK_CORTEX_M55_HELIUM,
+    AUDIOMARK_CORTEX_M85_HELIUM,
+    __AUDIOMARK_PROCESSOR_NUM,
+};
+
 /*!
  * \brief a user class for scene audiomark
  */
@@ -80,6 +91,12 @@ ARM_PRIVATE(
     int64_t lTimestamp[1];
     bool bUserAllocated;
 
+    struct {
+        progress_wheel_t tWheel;
+        int16_t iProgress;
+        int64_t lTimestamp;
+        const char *pchName;
+    } Processor[__AUDIOMARK_PROCESSOR_NUM];
 )
     /* place your public member here */
     

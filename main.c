@@ -121,6 +121,7 @@ void scene_clock_loader(void)
 typedef void scene_loader_t(void);
 
 static scene_loader_t * const c_SceneLoaders[] = {
+#if 0
     scene0_loader,
     scene1_loader,
     scene_meter_loader,
@@ -129,6 +130,7 @@ static scene_loader_t * const c_SceneLoaders[] = {
     scene4_loader,
     //scene2_loader,
     scene_fitness_loader,
+#endif
     scene_audiomark_loader,
 };
 
