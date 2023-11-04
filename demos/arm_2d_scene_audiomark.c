@@ -210,14 +210,12 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_audiomark_handler)
         
             arm_2d_layout(__top_canvas) {
                 __item_line_vertical(c_tileAudioPOVGRAY8.tRegion.tSize) {
-
-                    arm_2d_fill_colour(ptTile, &__item_region, GLCD_COLOR_WHITE);
                     
                     arm_2d_fill_colour_with_mask(   
                                                 ptTile, 
                                                 &__item_region, 
                                                 &c_tileAudioPOVGRAY8, 
-                                                (__arm_2d_color_t){GLCD_COLOR_BLACK});
+                                                (__arm_2d_color_t){GLCD_COLOR_WHITE});
 
                     extern
                     struct {
