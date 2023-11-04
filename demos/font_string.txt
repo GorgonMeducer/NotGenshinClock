@@ -1,0 +1,1 @@
+Cortex-M0Cortex-M4Cortex-M33Cortex-M7Cortex-M55Cortex-M85ScalerMVEHelium0123456789%:CPUGPUSoftUsageAudioMarkCMSISArm-2D+.

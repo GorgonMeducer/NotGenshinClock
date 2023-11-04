@@ -52,3 +52,4 @@ genshin_clock/resources/*.jpeg
 build/*
 *.co
 .DS_Store
+*.ttf
