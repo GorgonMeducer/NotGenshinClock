@@ -86,6 +86,7 @@ extern const arm_2d_tile_t c_tileCMSISLogo;
 extern const arm_2d_tile_t c_tileCMSISLogoMask;
 extern const arm_2d_tile_t c_tileCMSISLogoA2Mask;
 extern const arm_2d_tile_t c_tileCMSISLogoA4Mask;
+extern const arm_2d_tile_t c_tileAudioPOVGRAY8;
 /*============================ PROTOTYPES ====================================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
@@ -205,7 +206,33 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_audiomark_handler)
         
         arm_2d_fill_colour(ptTile, NULL, GLCD_COLOR_BLACK);
 
+        arm_2d_align_top_centre(__top_canvas, tScreenSize.iWidth, tScreenSize.iHeight >> 1) {
         
+            arm_2d_layout(__top_canvas) {
+                __item_line_vertical(c_tileAudioPOVGRAY8.tRegion.tSize) {
+
+                    arm_2d_fill_colour(ptTile, &__item_region, GLCD_COLOR_WHITE);
+                    
+                    arm_2d_fill_colour_with_mask(   
+                                                ptTile, 
+                                                &__item_region, 
+                                                &c_tileAudioPOVGRAY8, 
+                                                (__arm_2d_color_t){GLCD_COLOR_BLACK});
+
+                    extern
+                    struct {
+                        implement(arm_2d_user_font_t);
+                        arm_2d_char_idx_t tUTF8Table;
+                    } ARM_2D_FONT_ARIAL32_A4;
+
+                    arm_lcd_text_set_colour(GLCD_COLOR_GREEN, GLCD_COLOR_WHITE);
+                    arm_lcd_print_banner("AudioMark", __item_region, &ARM_2D_FONT_ARIAL32_A4);
+
+                }
+            }
+        }
+
+
         arm_2d_align_bottom_centre(__top_canvas, tScreenSize.iWidth, tScreenSize.iHeight >> 1) {
             
             for (int_fast8_t n = 0; n < dimof(this.Processor); n++) {
@@ -216,10 +243,8 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_audiomark_handler)
                     this.Processor[n].iProgress,
                     c_tProcessorInfo[n].chOpacity,
                     bIsNewFrame);
-                arm_2d_op_wait_async(NULL);
             }
 
-            arm_2d_op_wait_async(NULL);
         }
 #if 0
         arm_2d_align_centre(__top_canvas, 200, 100 ) {
