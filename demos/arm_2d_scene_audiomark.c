@@ -87,22 +87,51 @@ extern const arm_2d_tile_t c_tileCMSISLogoMask;
 extern const arm_2d_tile_t c_tileCMSISLogoA2Mask;
 extern const arm_2d_tile_t c_tileCMSISLogoA4Mask;
 extern const arm_2d_tile_t c_tileAudioPOVGRAY8;
+
+extern
+struct {
+    implement(arm_2d_user_font_t);
+    arm_2d_char_idx_t tUTF8Table;
+} ARM_2D_FONT_ARIAL32_A4;
+
+extern
+struct {
+    implement(arm_2d_user_font_t);
+    arm_2d_char_idx_t tUTF8Table;
+} ARM_2D_FONT_ARIAL20_A4;
+
+extern
+struct {
+    implement(arm_2d_user_font_t);
+    arm_2d_char_idx_t tUTF8Table;
+} ARM_2D_FONT_ARIAL16_A4;
+
 /*============================ PROTOTYPES ====================================*/
 /*============================ LOCAL VARIABLES ===============================*/
+
+#define PROCESSOR_INFO(__NAME, __SIZE, __SCORE, __COLOUR, __SCORE_COLOUR, __FONT)        \
+            {__NAME, (__SIZE), (__SCORE), (__COLOUR), (__SCORE_COLOUR), (arm_2d_font_t *)&(__FONT)}
 
 static const struct {
     const char  *pchName;
     int16_t     iWheelSize;
     int16_t     iAudioMark;
     COLOUR_INT  tColour;
-    uint8_t     chOpacity;
+    COLOUR_INT  tScoreColour;
+    arm_2d_font_t *ptScoreFont;
 } c_tProcessorInfo[] = {
-    [AUDIOMARK_CORTEX_M4]           = { "Cortex-M4",           100 + 75 * 0,    73,     GLCD_COLOR_LIGHT_GREY,  128         },
-    [AUDIOMARK_CORTEX_M33]          = { "Cortex-M33",           65 + 75 * 1,    101,    GLCD_COLOR_LIGHT_GREY,  128         },
-    [AUDIOMARK_CORTEX_M7]           = { "Cortex-M7",            35 + 75 * 2,    132,    GLCD_COLOR_LIGHT_GREY,  255         },
-    [AUDIOMARK_CORTEX_M85_SCALER]   = { "Cortex-M85 Scaler",    20 + 75 * 3,    201,    GLCD_COLOR_GREEN,       128,        },
-    [AUDIOMARK_CORTEX_M55_HELIUM]   = { "Cortex-M55 Helium",    20 + 75 * 4,    367,    GLCD_COLOR_GREEN,       256 - 64,   },
-    [AUDIOMARK_CORTEX_M85_HELIUM]   = { "Cortex-M85 Helium",    40 + 75 * 5,    423,    GLCD_COLOR_GREEN,       255,        },
+    [AUDIOMARK_CORTEX_M4]           
+        = PROCESSOR_INFO( "Cortex-M4",           100 + 75 * 0,    73,     __RGB(0x40, 0x40, 0x40),  __RGB(0x80, 0x80, 0x80), ARM_2D_FONT_ARIAL20_A4 ),
+    [AUDIOMARK_CORTEX_M33]          
+        = PROCESSOR_INFO( "Cortex-M33",           65 + 75 * 1,    101,    __RGB(0x60, 0x60, 0x60),  __RGB(0xFF, 0xFF, 0xFF), ARM_2D_FONT_ARIAL20_A4 ),
+    [AUDIOMARK_CORTEX_M7]           
+        = PROCESSOR_INFO( "Cortex-M7",            35 + 75 * 2,    132,    __RGB(0x80, 0x80, 0x80),  __RGB(0x80, 0x80, 0x80), ARM_2D_FONT_ARIAL20_A4 ),
+    [AUDIOMARK_CORTEX_M85_SCALER]   
+        = PROCESSOR_INFO( "Cortex-M85 Scaler",    20 + 75 * 3,    201,    __RGB(0x00, 0x80, 0x00),  __RGB(0xFF, 0xFF, 0xFF), ARM_2D_FONT_ARIAL32_A4 ),
+    [AUDIOMARK_CORTEX_M55_HELIUM]   
+        = PROCESSOR_INFO( "Cortex-M55 Helium",    20 + 75 * 4,    367,    __RGB(0x00, 0xC0, 0x00),  __RGB(0x00, 0xC0, 0x00), ARM_2D_FONT_ARIAL32_A4 ),
+    [AUDIOMARK_CORTEX_M85_HELIUM]   
+        = PROCESSOR_INFO( "Cortex-M85 Helium",    40 + 75 * 5,    423,    GLCD_COLOR_GREEN,         __RGB(0xFF, 0x80, 0x00), ARM_2D_FONT_ARIAL32_A4),
 };
 
 /*============================ IMPLEMENTATION ================================*/
@@ -206,36 +235,32 @@ void __draw_processor_list_item(user_scene_audiomark_t *ptThis,
         arm_2d_layout(__processor_bar_canvas) {
 
             __item_line_horizontal(160, __processor_bar_canvas.tSize.iHeight) {
-                extern
-                struct {
-                    implement(arm_2d_user_font_t);
-                    arm_2d_char_idx_t tUTF8Table;
-                } ARM_2D_FONT_ARIAL16_A4;
                 arm_lcd_text_set_target_framebuffer((arm_2d_tile_t *)&__processor_bar);
 
                 arm_lcd_text_set_colour(__RGB(0x56, 0xB7, 0xF3), GLCD_COLOR_WHITE);
                 arm_lcd_print_banner(this.Processor[chIndex].pchName, __item_region, &ARM_2D_FONT_ARIAL16_A4);
             }
 
-            __item_line_horizontal(320, __processor_bar_canvas.tSize.iHeight) {
-                /*
-                #define __progress_bar_flowing_show7(   __TARGET_TILE_PTR,      \
-                                        __REGION_PTR,                           \
-                                        __PROGRESS,                             \
-                                        __IS_NEW_FRAME,                         \
-                                        __BAR_COLOUR,                           \
-                                        __PITCH_COLOUR,                         \
-                                        __BOARDER_COLOUR)                       \
+            __item_line_horizontal(200, __processor_bar_canvas.tSize.iHeight) {
 
-                */
+               progress_bar_drill_show( &__processor_bar,
+                                        &__item_region,
+                                        c_tProcessorInfo[chIndex].iAudioMark * 2,
+                                        c_tProcessorInfo[chIndex].tColour,
+                                        bIsNewFrame);
+            }
 
-               progress_bar_flowing_show(   &__processor_bar,
-                                            &__item_region,
-                                            c_tProcessorInfo[chIndex].iAudioMark,
-                                            bIsNewFrame,
-                                            c_tProcessorInfo[chIndex].tColour,
-                                            GLCD_COLOR_WHITE,
-                                            c_tProcessorInfo[chIndex].tColour);
+            __item_line_horizontal(100, __processor_bar_canvas.tSize.iHeight, 10, 0, 0, 0) {
+
+                arm_2d_align_centre(__item_region, __item_region.tSize.iWidth, c_tProcessorInfo[chIndex].ptScoreFont->tCharSize.iHeight) {
+                    arm_lcd_text_set_target_framebuffer((arm_2d_tile_t *)&__processor_bar);
+                    arm_lcd_text_set_colour(c_tProcessorInfo[chIndex].tScoreColour, GLCD_COLOR_WHITE);
+                    arm_lcd_text_set_font((const arm_2d_font_t *)(c_tProcessorInfo[chIndex].ptScoreFont));
+                    arm_lcd_text_set_draw_region(&__centre_region);
+                    arm_lcd_text_location(0,0);
+                    arm_lcd_printf("%1.2f", (float)c_tProcessorInfo[chIndex].iAudioMark / 100.0f);
+                }
+
             }
 
         }
@@ -273,14 +298,21 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_audiomark_handler)
                                                 &c_tileAudioPOVGRAY8, 
                                                 (__arm_2d_color_t){GLCD_COLOR_WHITE});
 
-                    extern
-                    struct {
-                        implement(arm_2d_user_font_t);
-                        arm_2d_char_idx_t tUTF8Table;
-                    } ARM_2D_FONT_ARIAL32_A4;
+
 
                     arm_lcd_text_set_colour(GLCD_COLOR_WHITE, GLCD_COLOR_WHITE);
                     arm_lcd_print_banner("AudioMark", __item_region, &ARM_2D_FONT_ARIAL32_A4);
+
+                    arm_2d_align_bottom_right(__item_region, 300, 70) {
+                        arm_lcd_text_set_target_framebuffer(NULL);
+                        arm_lcd_text_set_colour(GLCD_COLOR_GREEN, GLCD_COLOR_WHITE);
+                        arm_lcd_text_set_font((const arm_2d_font_t *)(&ARM_2D_FONT_6x8));
+
+                        
+                        arm_lcd_text_set_draw_region(&__bottom_right_region);
+                        arm_lcd_text_location(0,0);
+                        arm_lcd_puts("https://www.eembc.org/audiomark/scores.php");
+                    }
 
                 }
 
@@ -322,7 +354,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_audiomark_handler)
                     ptTile, 
                     &__bottom_centre_region,       
                     this.Processor[n].iProgress,
-                    c_tProcessorInfo[n].chOpacity,
+                    255,
                     bIsNewFrame);
             }
 
