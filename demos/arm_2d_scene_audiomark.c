@@ -91,10 +91,10 @@ extern const arm_2d_tile_t c_tileAudioPOVGRAY8;
 /*============================ LOCAL VARIABLES ===============================*/
 
 static const struct {
-    const char  *chName;
+    const char  *pchName;
     int16_t     iWheelSize;
     int16_t     iAudioMark;
-    COLOUR_INT  tWheelColour;
+    COLOUR_INT  tColour;
     uint8_t     chOpacity;
 } c_tProcessorInfo[] = {
     [AUDIOMARK_CORTEX_M4]           = { "Cortex-M4",           100 + 75 * 0,    73,     GLCD_COLOR_LIGHT_GREY,  128         },
@@ -189,6 +189,62 @@ static void __before_scene_audiomark_switching_out(arm_2d_scene_t *ptScene)
 
 }
 
+void __draw_processor_list_item(user_scene_audiomark_t *ptThis,
+                                const arm_2d_tile_t *ptTile, 
+                                const arm_2d_region_t *ptRegion, 
+                                uint_fast8_t chIndex,
+                                bool bIsNewFrame)
+{
+
+    arm_2d_container(ptTile, __processor_bar, ptRegion) {
+        draw_round_corner_box(  &__processor_bar, 
+                                &__processor_bar_canvas, 
+                                GLCD_COLOR_WHITE, 
+                                32,
+                                bIsNewFrame);
+
+        arm_2d_layout(__processor_bar_canvas) {
+
+            __item_line_horizontal(160, __processor_bar_canvas.tSize.iHeight) {
+                extern
+                struct {
+                    implement(arm_2d_user_font_t);
+                    arm_2d_char_idx_t tUTF8Table;
+                } ARM_2D_FONT_ARIAL16_A4;
+                arm_lcd_text_set_target_framebuffer((arm_2d_tile_t *)&__processor_bar);
+
+                arm_lcd_text_set_colour(__RGB(0x56, 0xB7, 0xF3), GLCD_COLOR_WHITE);
+                arm_lcd_print_banner(this.Processor[chIndex].pchName, __item_region, &ARM_2D_FONT_ARIAL16_A4);
+            }
+
+            __item_line_horizontal(320, __processor_bar_canvas.tSize.iHeight) {
+                /*
+                #define __progress_bar_flowing_show7(   __TARGET_TILE_PTR,      \
+                                        __REGION_PTR,                           \
+                                        __PROGRESS,                             \
+                                        __IS_NEW_FRAME,                         \
+                                        __BAR_COLOUR,                           \
+                                        __PITCH_COLOUR,                         \
+                                        __BOARDER_COLOUR)                       \
+
+                */
+
+               progress_bar_flowing_show(   &__processor_bar,
+                                            &__item_region,
+                                            c_tProcessorInfo[chIndex].iAudioMark,
+                                            bIsNewFrame,
+                                            c_tProcessorInfo[chIndex].tColour,
+                                            GLCD_COLOR_WHITE,
+                                            c_tProcessorInfo[chIndex].tColour);
+            }
+
+        }
+
+
+    }
+
+}
+
 static
 IMPL_PFB_ON_DRAW(__pfb_draw_scene_audiomark_handler)
 {
@@ -223,10 +279,37 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_audiomark_handler)
                         arm_2d_char_idx_t tUTF8Table;
                     } ARM_2D_FONT_ARIAL32_A4;
 
-                    arm_lcd_text_set_colour(GLCD_COLOR_GREEN, GLCD_COLOR_WHITE);
+                    arm_lcd_text_set_colour(GLCD_COLOR_WHITE, GLCD_COLOR_WHITE);
                     arm_lcd_print_banner("AudioMark", __item_region, &ARM_2D_FONT_ARIAL32_A4);
 
                 }
+
+                __item_line_vertical(450, 35, 15, 15, 0, 5) {
+                    __draw_processor_list_item(ptThis, ptTile, &__item_region, AUDIOMARK_CORTEX_M4, bIsNewFrame);
+                    
+                    
+                }
+
+                __item_line_vertical(450, 35, 15, 15, 5, 5) {
+                    __draw_processor_list_item(ptThis, ptTile, &__item_region, AUDIOMARK_CORTEX_M33, bIsNewFrame);
+                }
+
+                __item_line_vertical(450, 35, 15, 15, 5, 5) {
+                    __draw_processor_list_item(ptThis, ptTile, &__item_region, AUDIOMARK_CORTEX_M7, bIsNewFrame);
+                }
+
+                __item_line_vertical(450, 35, 15, 15, 5, 5) {
+                    __draw_processor_list_item(ptThis, ptTile, &__item_region, AUDIOMARK_CORTEX_M85_SCALER, bIsNewFrame);
+                }
+
+                __item_line_vertical(450, 35, 15, 15, 5, 5) {
+                    __draw_processor_list_item(ptThis, ptTile, &__item_region, AUDIOMARK_CORTEX_M55_HELIUM, bIsNewFrame);
+                }
+
+                __item_line_vertical(450, 35, 15, 15, 5, 5) {
+                    __draw_processor_list_item(ptThis, ptTile, &__item_region, AUDIOMARK_CORTEX_M85_HELIUM, bIsNewFrame);
+                }
+
             }
         }
 
@@ -366,7 +449,8 @@ user_scene_audiomark_t *__arm_2d_scene_audiomark_init(   arm_2d_scene_player_t *
     for (uint_fast8_t n = 0; n < dimof(this.Processor); n++) {
         progress_wheel_init(&this.Processor[n].tWheel, 
                             c_tProcessorInfo[n].iWheelSize, 
-                            c_tProcessorInfo[n].tWheelColour);
+                            c_tProcessorInfo[n].tColour);
+        this.Processor[n].pchName = c_tProcessorInfo[n].pchName;
         this.Processor[n].iProgress = 0;
     }
 
