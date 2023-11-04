@@ -358,6 +358,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_audiomark_handler)
                     bIsNewFrame);
             }
 
+        #if __FITNESS_CFG_NEBULA_ENABLE__
             /* show nebula */
             dynamic_nebula_show(&this.tNebula, 
                                 ptTile, 
@@ -365,37 +366,9 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_audiomark_handler)
                                 GLCD_COLOR_WHITE, 
                                 255,
                                 bIsNewFrame);
-
-        }
-#if 0
-        arm_2d_align_centre(__top_canvas, 200, 100 ) {
-            draw_round_corner_box(  ptTile, 
-                                    &__centre_region, 
-                                    GLCD_COLOR_WHITE, 
-                                    255,
-                                    bIsNewFrame);
-            
-            arm_2d_op_wait_async(NULL);
-            
-            draw_round_corner_border(   ptTile, 
-                                        &__centre_region, 
-                                        GLCD_COLOR_BLACK, 
-                                        (arm_2d_border_opacity_t)
-                                            {32, 32, 255-64, 255-64},
-                                        (arm_2d_corner_opacity_t)
-                                            {0, 128, 128, 128});
-                                    
+        #endif
         }
 
-
-        /* draw text at the top-left corner */
-        arm_lcd_text_set_target_framebuffer((arm_2d_tile_t *)ptTile);
-        arm_lcd_text_set_font(&ARM_2D_FONT_6x8.use_as__arm_2d_font_t);
-        arm_lcd_text_set_draw_region(NULL);
-        arm_lcd_text_set_colour(GLCD_COLOR_RED, GLCD_COLOR_WHITE);
-        arm_lcd_text_location(0,0);
-        arm_lcd_puts("Scene audiomark");
-#endif
     /*-----------------------draw the foreground end  -----------------------*/
     }
     arm_2d_op_wait_async(NULL);
@@ -494,7 +467,7 @@ user_scene_audiomark_t *__arm_2d_scene_audiomark_init(   arm_2d_scene_player_t *
         this.Processor[n].iProgress = 0;
     }
 
-
+#if __FITNESS_CFG_NEBULA_ENABLE__
     do {
         dynamic_nebula_cfg_t tCFG = {
             .fSpeed = 1.0f,
@@ -505,6 +478,7 @@ user_scene_audiomark_t *__arm_2d_scene_audiomark_init(   arm_2d_scene_player_t *
         };
         dynamic_nebula_init(&this.tNebula, &tCFG);
     } while(0);
+#endif
 
     /* ------------   initialize members of user_scene_audiomark_t end   ---------------*/
 

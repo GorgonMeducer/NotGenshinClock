@@ -53,6 +53,15 @@ extern "C" {
 #endif
 #include "arm_2d_utils.h"
 
+
+#ifndef __FITNESS_CFG_NEBULA_ENABLE__
+#   define __FITNESS_CFG_NEBULA_ENABLE__        0
+#endif
+
+#if __FITNESS_CFG_NEBULA_ENABLE__
+#   define NEBULA_PARTICLE_COUNT                200
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
 /*!
@@ -90,9 +99,11 @@ ARM_PRIVATE(
     /* place your private member here, following two are examples */
     int64_t lTimestamp[1];
     bool bUserAllocated;
-
+    
+#if __FITNESS_CFG_NEBULA_ENABLE__
     dynamic_nebula_t tNebula;
-    dynamic_nebula_particle_t tParticles[200];
+    dynamic_nebula_particle_t tParticles[NEBULA_PARTICLE_COUNT];
+#endif
 
     struct {
         progress_wheel_t tWheel;
