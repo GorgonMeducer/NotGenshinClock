@@ -29,6 +29,7 @@
 #include "demos/arm_2d_scene_meter.h"
 #include "demos/arm_2d_scene_watch.h"
 #include "demos/arm_2d_scene_fitness.h"
+#include "demos/arm_2d_scene_audiomark.h"
 
 #include "genshin_clock/arm_2d_scene_genshin_clock.h"
 
@@ -77,6 +78,11 @@ void scene_fitness_loader(void)
     arm_2d_scene_fitness_init(&DISP0_ADAPTER);
 }
 
+void scene_audiomark_loader(void) 
+{
+    arm_2d_scene_audiomark_init(&DISP0_ADAPTER);
+}
+
 void scene0_loader(void) 
 {
     arm_2d_scene0_init(&DISP0_ADAPTER);
@@ -121,10 +127,9 @@ static scene_loader_t * const c_SceneLoaders[] = {
     //scene3_loader,
     scene5_loader,
     scene4_loader,
-    scene2_loader,
+    //scene2_loader,
     scene_fitness_loader,
-    //scene_clock_loader,
-    //scene_watch_loader,
+    scene_audiomark_loader,
 };
 
 
