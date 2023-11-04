@@ -91,6 +91,9 @@ ARM_PRIVATE(
     int64_t lTimestamp[1];
     bool bUserAllocated;
 
+    dynamic_nebula_t tNebula;
+    dynamic_nebula_particle_t tParticles[200];
+
     struct {
         progress_wheel_t tWheel;
         int16_t iProgress;

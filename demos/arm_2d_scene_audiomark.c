@@ -358,6 +358,14 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_audiomark_handler)
                     bIsNewFrame);
             }
 
+            /* show nebula */
+            dynamic_nebula_show(&this.tNebula, 
+                                ptTile, 
+                                &__bottom_centre_region, 
+                                GLCD_COLOR_WHITE, 
+                                255,
+                                bIsNewFrame);
+
         }
 #if 0
         arm_2d_align_centre(__top_canvas, 200, 100 ) {
@@ -485,6 +493,18 @@ user_scene_audiomark_t *__arm_2d_scene_audiomark_init(   arm_2d_scene_player_t *
         this.Processor[n].pchName = c_tProcessorInfo[n].pchName;
         this.Processor[n].iProgress = 0;
     }
+
+
+    do {
+        dynamic_nebula_cfg_t tCFG = {
+            .fSpeed = 1.0f,
+            .iRadius = 80,
+            .iVisibleRingWidth = 80,
+            .hwParticleCount = dimof(this.tParticles),
+            .ptParticles = this.tParticles,
+        };
+        dynamic_nebula_init(&this.tNebula, &tCFG);
+    } while(0);
 
     /* ------------   initialize members of user_scene_audiomark_t end   ---------------*/
 
