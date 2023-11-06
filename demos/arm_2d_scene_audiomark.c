@@ -531,7 +531,7 @@ user_scene_audiomark_t *__arm_2d_scene_audiomark_init(   arm_2d_scene_player_t *
                             c_tProcessorInfo[n].iWheelSize, 
                             c_tProcessorInfo[n].tColour,
                             GLCD_COLOR_WHITE,
-                            &this.use_as__arm_2d_scene_t.ptDirtyRegion);
+                            NULL);
                 break;
             case AUDIOMARK_CORTEX_M55_HELIUM:
             case AUDIOMARK_CORTEX_M85_SCALER:
@@ -542,7 +542,7 @@ user_scene_audiomark_t *__arm_2d_scene_audiomark_init(   arm_2d_scene_player_t *
                     GLCD_COLOR_WHITE,
                     &c_tileQuaterArcBigMask,
                     &c_tileBigWhiteDotMask,
-                    &this.use_as__arm_2d_scene_t.ptDirtyRegion);
+                    NULL);
                 break;
             default:
                 assert(false);
