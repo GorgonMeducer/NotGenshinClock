@@ -104,6 +104,30 @@ extern
 struct {
     implement(arm_2d_user_font_t);
     arm_2d_char_idx_t tUTF8Table;
+} ARM_2D_FONT_ARIAL24_A4;
+
+extern
+struct {
+    implement(arm_2d_user_font_t);
+    arm_2d_char_idx_t tUTF8Table;
+} ARM_2D_FONT_ARIAL24_A2;
+
+extern
+struct {
+    implement(arm_2d_user_font_t);
+    arm_2d_char_idx_t tUTF8Table;
+} ARM_2D_FONT_ARIAL24_A1;
+
+extern
+struct {
+    implement(arm_2d_user_font_t);
+    arm_2d_char_idx_t tUTF8Table;
+} ARM_2D_FONT_ARIAL24_A8;
+
+extern
+struct {
+    implement(arm_2d_user_font_t);
+    arm_2d_char_idx_t tUTF8Table;
 } ARM_2D_FONT_ARIAL16_A4;
 
 extern const arm_2d_tile_t c_tileInnerGearMask;
@@ -363,7 +387,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_audiomark_handler)
 
 
                     arm_lcd_text_set_colour(GLCD_COLOR_WHITE, GLCD_COLOR_WHITE);
-                    arm_lcd_print_banner("Animated Benchmark: AudioMark", __item_region, &ARM_2D_FONT_ARIAL20_A4);
+                    arm_lcd_print_banner("Animated Benchmark Data: AudioMark", __item_region, &ARM_2D_FONT_ARIAL20_A4);
 
                     arm_2d_align_bottom_right(__item_region, 300, 70) {
                         arm_lcd_text_set_target_framebuffer(NULL);

@@ -323,8 +323,8 @@ IMPL_FONT_DRAW_CHAR(__utf8_font_a1_draw_char)
                                             tForeColour,
                                             chOpacity);
 #elif defined(__UTF8_FONT_SIZE_1__)
-    return arm_2d_draw_pattern(    ptileChar, 
-                            ptTile, 
+    return arm_2d_draw_pattern(    ptileChar,
+                            ptTile,
                             ptRegion,
                             ARM_2D_DRW_PATN_MODE_COPY,
                             tForeColour,
@@ -337,7 +337,7 @@ IMPL_FONT_DRAW_CHAR(__utf8_font_a1_draw_char)
                                         (__arm_2d_color_t){tForeColour},
                                         chOpacity);
 #endif
-                                            
+
 }
 
 
@@ -784,8 +784,8 @@ IMPL_FONT_DRAW_CHAR(__utf8_font_a2_draw_char)
                                             tForeColour,
                                             chOpacity);
 #elif defined(__UTF8_FONT_SIZE_1__)
-    return arm_2d_draw_pattern(    ptileChar, 
-                            ptTile, 
+    return arm_2d_draw_pattern(    ptileChar,
+                            ptTile,
                             ptRegion,
                             ARM_2D_DRW_PATN_MODE_COPY,
                             tForeColour,
@@ -798,7 +798,7 @@ IMPL_FONT_DRAW_CHAR(__utf8_font_a2_draw_char)
                                         (__arm_2d_color_t){tForeColour},
                                         chOpacity);
 #endif
-                                            
+
 }
 
 
@@ -1408,8 +1408,8 @@ IMPL_FONT_DRAW_CHAR(__utf8_font_a4_draw_char)
                                             tForeColour,
                                             chOpacity);
 #elif defined(__UTF8_FONT_SIZE_1__)
-    return arm_2d_draw_pattern(    ptileChar, 
-                            ptTile, 
+    return arm_2d_draw_pattern(    ptileChar,
+                            ptTile,
                             ptRegion,
                             ARM_2D_DRW_PATN_MODE_COPY,
                             tForeColour,
@@ -1422,7 +1422,7 @@ IMPL_FONT_DRAW_CHAR(__utf8_font_a4_draw_char)
                                         (__arm_2d_color_t){tForeColour},
                                         chOpacity);
 #endif
-                                            
+
 }
 
 
@@ -2318,8 +2318,8 @@ IMPL_FONT_DRAW_CHAR(__utf8_font_a8_draw_char)
                                             tForeColour,
                                             chOpacity);
 #elif defined(__UTF8_FONT_SIZE_1__)
-    return arm_2d_draw_pattern(    ptileChar, 
-                            ptTile, 
+    return arm_2d_draw_pattern(    ptileChar,
+                            ptTile,
                             ptRegion,
                             ARM_2D_DRW_PATN_MODE_COPY,
                             tForeColour,
@@ -2332,7 +2332,7 @@ IMPL_FONT_DRAW_CHAR(__utf8_font_a8_draw_char)
                                         (__arm_2d_color_t){tForeColour},
                                         chOpacity);
 #endif
-                                            
+
 }
 
 
