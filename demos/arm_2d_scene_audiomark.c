@@ -363,7 +363,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_audiomark_handler)
 
 
                     arm_lcd_text_set_colour(GLCD_COLOR_WHITE, GLCD_COLOR_WHITE);
-                    arm_lcd_print_banner("AudioMark", __item_region, &ARM_2D_FONT_ARIAL32_A4);
+                    arm_lcd_print_banner("Animated Benchmark: AudioMark", __item_region, &ARM_2D_FONT_ARIAL20_A4);
 
                     arm_2d_align_bottom_right(__item_region, 300, 70) {
                         arm_lcd_text_set_target_framebuffer(NULL);
