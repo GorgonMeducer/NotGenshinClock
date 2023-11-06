@@ -110,6 +110,10 @@ extern const arm_2d_tile_t c_tileInnerGearMask;
 extern const arm_2d_tile_t c_tileInnerGearMidMask;
 extern const arm_2d_tile_t c_tileGenshinPointerMask;
 
+extern const arm_2d_tile_t c_tileBigWhiteDotMask;
+extern const arm_2d_tile_t c_tileQuaterArcBigMask;
+
+
 /*============================ PROTOTYPES ====================================*/
 /*============================ LOCAL VARIABLES ===============================*/
 
@@ -518,9 +522,31 @@ user_scene_audiomark_t *__arm_2d_scene_audiomark_init(   arm_2d_scene_player_t *
     /* ------------   initialize members of user_scene_audiomark_t begin ---------------*/
 
     for (uint_fast8_t n = 0; n < dimof(this.Processor); n++) {
-        progress_wheel_init(&this.Processor[n].tWheel, 
+
+        switch (n) {
+            case AUDIOMARK_CORTEX_M4:
+            case AUDIOMARK_CORTEX_M33:
+            case AUDIOMARK_CORTEX_M7:
+                progress_wheel_init(&this.Processor[n].tWheel, 
                             c_tProcessorInfo[n].iWheelSize, 
                             c_tProcessorInfo[n].tColour);
+                break;
+            case AUDIOMARK_CORTEX_M55_HELIUM:
+            case AUDIOMARK_CORTEX_M85_SCALER:
+            case AUDIOMARK_CORTEX_M85_HELIUM:
+                progress_wheel_init(&this.Processor[n].tWheel, 
+                    c_tProcessorInfo[n].iWheelSize, 
+                    c_tProcessorInfo[n].tColour,
+                    GLCD_COLOR_WHITE,
+                    &c_tileQuaterArcBigMask,
+                    &c_tileBigWhiteDotMask,
+                    NULL);
+                break;
+            default:
+                assert(false);
+                break;
+        }
+
         this.Processor[n].pchName = c_tProcessorInfo[n].pchName;
         this.Processor[n].iProgress = 0;
     }
