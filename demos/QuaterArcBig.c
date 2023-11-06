@@ -1,5 +1,5 @@
 
-/* Generated on Mon Nov  6 04:17:49 2023 from -i */
+/* Generated on Mon Nov  6 04:23:45 2023 from -i */
 /* Re-sized : True */
 /* Rotated : 0.0 deg */
 
@@ -18,8 +18,8 @@
 #endif
 
 
-ARM_ALIGN(4) ARM_SECTION("arm2d.asset.c_bmpQuaterArcBitAlpha")
-static const uint8_t c_bmpQuaterArcBitAlpha[240*240] = {
+ARM_ALIGN(4) ARM_SECTION("arm2d.asset.c_bmpQuaterArcBigAlpha")
+static const uint8_t c_bmpQuaterArcBigAlpha[240*240] = {
 /* -0- */
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -4101,8 +4101,8 @@ static const uint8_t c_bmpQuaterArcBitAlpha[240*240] = {
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 
 };
-ARM_ALIGN(4) ARM_SECTION("arm2d.asset.c_bmpQuaterArcBitA2Alpha")
-static const uint8_t c_bmpQuaterArcBitA2Alpha[60*240] = {
+ARM_ALIGN(4) ARM_SECTION("arm2d.asset.c_bmpQuaterArcBigA2Alpha")
+static const uint8_t c_bmpQuaterArcBigA2Alpha[60*240] = {
 /* -0- */
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -5304,8 +5304,8 @@ static const uint8_t c_bmpQuaterArcBitA2Alpha[60*240] = {
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
 };
-ARM_ALIGN(4) ARM_SECTION("arm2d.asset.c_bmpQuaterArcBitA4Alpha")
-static const uint8_t c_bmpQuaterArcBitA4Alpha[120*240] = {
+ARM_ALIGN(4) ARM_SECTION("arm2d.asset.c_bmpQuaterArcBigA4Alpha")
+static const uint8_t c_bmpQuaterArcBigA4Alpha[120*240] = {
 /* -0- */
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -7468,8 +7468,8 @@ static const uint8_t c_bmpQuaterArcBitA4Alpha[120*240] = {
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
 };
 
-ARM_SECTION("arm2d.asset.c_bmpQuaterArcBitGRAY8")
-const uint8_t c_bmpQuaterArcBitGRAY8[240*240] = {
+ARM_SECTION("arm2d.asset.c_bmpQuaterArcBigGRAY8")
+const uint8_t c_bmpQuaterArcBigGRAY8[240*240] = {
 /* -0- */
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -9632,8 +9632,8 @@ const uint8_t c_bmpQuaterArcBitGRAY8[240*240] = {
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
 };
 
-ARM_SECTION("arm2d.asset.c_bmpQuaterArcBitRGB565")
-const uint16_t c_bmpQuaterArcBitRGB565[240*240] = {
+ARM_SECTION("arm2d.asset.c_bmpQuaterArcBigRGB565")
+const uint16_t c_bmpQuaterArcBigRGB565[240*240] = {
 /* -0- */
 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
@@ -13716,8 +13716,8 @@ const uint16_t c_bmpQuaterArcBitRGB565[240*240] = {
 
 };
 
-ARM_SECTION("arm2d.asset.c_bmpQuaterArcBitCCCA8888")
-const uint32_t c_bmpQuaterArcBitCCCA8888[240*240] = {
+ARM_SECTION("arm2d.asset.c_bmpQuaterArcBigCCCA8888")
+const uint32_t c_bmpQuaterArcBigCCCA8888[240*240] = {
 /* -0- */
 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
@@ -17801,9 +17801,9 @@ const uint32_t c_bmpQuaterArcBitCCCA8888[240*240] = {
 };
 
 
-extern const arm_2d_tile_t c_tileQuaterArcBitGRAY8;
-ARM_SECTION("arm2d.tile.c_tileQuaterArcBitGRAY8")
-const arm_2d_tile_t c_tileQuaterArcBitGRAY8 = {
+extern const arm_2d_tile_t c_tileQuaterArcBigGRAY8;
+ARM_SECTION("arm2d.tile.c_tileQuaterArcBigGRAY8")
+const arm_2d_tile_t c_tileQuaterArcBigGRAY8 = {
     .tRegion = {
         .tSize = {
             .iWidth = 240,
@@ -17817,15 +17817,15 @@ const arm_2d_tile_t c_tileQuaterArcBitGRAY8 = {
             .chScheme = ARM_2D_COLOUR_GRAY8,
         },
     },
-    .pchBuffer = (uint8_t*)c_bmpQuaterArcBitGRAY8,
+    .pchBuffer = (uint8_t*)c_bmpQuaterArcBigGRAY8,
 };
 
 
 
 
-extern const arm_2d_tile_t c_tileQuaterArcBitRGB565;
-ARM_SECTION("arm2d.tile.c_tileQuaterArcBitRGB565")
-const arm_2d_tile_t c_tileQuaterArcBitRGB565 = {
+extern const arm_2d_tile_t c_tileQuaterArcBigRGB565;
+ARM_SECTION("arm2d.tile.c_tileQuaterArcBigRGB565")
+const arm_2d_tile_t c_tileQuaterArcBigRGB565 = {
     .tRegion = {
         .tSize = {
             .iWidth = 240,
@@ -17839,16 +17839,16 @@ const arm_2d_tile_t c_tileQuaterArcBitRGB565 = {
             .chScheme = ARM_2D_COLOUR_RGB565,
         },
     },
-    .phwBuffer = (uint16_t*)c_bmpQuaterArcBitRGB565,
+    .phwBuffer = (uint16_t*)c_bmpQuaterArcBigRGB565,
 };
 
 
 
 
-extern const arm_2d_tile_t c_tileQuaterArcBitCCCA8888;
+extern const arm_2d_tile_t c_tileQuaterArcBigCCCA8888;
 
-ARM_SECTION("arm2d.tile.c_tileQuaterArcBitCCCA8888")
-const arm_2d_tile_t c_tileQuaterArcBitCCCA8888 = {
+ARM_SECTION("arm2d.tile.c_tileQuaterArcBigCCCA8888")
+const arm_2d_tile_t c_tileQuaterArcBigCCCA8888 = {
     .tRegion = {
         .tSize = {
             .iWidth = 240,
@@ -17862,17 +17862,17 @@ const arm_2d_tile_t c_tileQuaterArcBitCCCA8888 = {
             .chScheme = ARM_2D_COLOUR_BGRA8888,
         },
     },
-    .pwBuffer = (uint32_t*)c_bmpQuaterArcBitCCCA8888,
+    .pwBuffer = (uint32_t*)c_bmpQuaterArcBigCCCA8888,
 };
 
 
 
 
 
-extern const arm_2d_tile_t c_tileQuaterArcBitMask2;
+extern const arm_2d_tile_t c_tileQuaterArcBigMask2;
 
-ARM_SECTION("arm2d.tile.c_tileQuaterArcBitMask2")
-const arm_2d_tile_t c_tileQuaterArcBitMask2 = {
+ARM_SECTION("arm2d.tile.c_tileQuaterArcBigMask2")
+const arm_2d_tile_t c_tileQuaterArcBigMask2 = {
     .tRegion = {
         .tSize = {
             .iWidth = 240,
@@ -17886,16 +17886,16 @@ const arm_2d_tile_t c_tileQuaterArcBitMask2 = {
             .chScheme = ARM_2D_CHANNEL_8in32,
         },
     },
-    .nAddress = ((intptr_t)c_bmpQuaterArcBitCCCA8888) + 3,
+    .nAddress = ((intptr_t)c_bmpQuaterArcBigCCCA8888) + 3,
 };
 
 
 
 
-extern const arm_2d_tile_t c_tileQuaterArcBitMask;
+extern const arm_2d_tile_t c_tileQuaterArcBigMask;
 
-ARM_SECTION("arm2d.tile.c_tileQuaterArcBitMask")
-const arm_2d_tile_t c_tileQuaterArcBitMask = {
+ARM_SECTION("arm2d.tile.c_tileQuaterArcBigMask")
+const arm_2d_tile_t c_tileQuaterArcBigMask = {
     .tRegion = {
         .tSize = {
             .iWidth = 240,
@@ -17909,16 +17909,16 @@ const arm_2d_tile_t c_tileQuaterArcBitMask = {
             .chScheme = ARM_2D_COLOUR_8BIT,
         },
     },
-    .pchBuffer = (uint8_t *)c_bmpQuaterArcBitAlpha,
+    .pchBuffer = (uint8_t *)c_bmpQuaterArcBigAlpha,
 };
 
 
 
 
-extern const arm_2d_tile_t c_tileQuaterArcBitA2Mask;
+extern const arm_2d_tile_t c_tileQuaterArcBigA2Mask;
 
-ARM_SECTION("arm2d.tile.c_tileQuaterArcBitA2Mask")
-const arm_2d_tile_t c_tileQuaterArcBitA2Mask = {
+ARM_SECTION("arm2d.tile.c_tileQuaterArcBigA2Mask")
+const arm_2d_tile_t c_tileQuaterArcBigA2Mask = {
     .tRegion = {
         .tSize = {
             .iWidth = 240,
@@ -17932,16 +17932,16 @@ const arm_2d_tile_t c_tileQuaterArcBitA2Mask = {
             .chScheme = ARM_2D_COLOUR_MASK_A2,
         },
     },
-    .pchBuffer = (uint8_t *)c_bmpQuaterArcBitA2Alpha,
+    .pchBuffer = (uint8_t *)c_bmpQuaterArcBigA2Alpha,
 };
 
 
 
 
-extern const arm_2d_tile_t c_tileQuaterArcBitA4Mask;
+extern const arm_2d_tile_t c_tileQuaterArcBigA4Mask;
 
-ARM_SECTION("arm2d.tile.c_tileQuaterArcBitA4Mask")
-const arm_2d_tile_t c_tileQuaterArcBitA4Mask = {
+ARM_SECTION("arm2d.tile.c_tileQuaterArcBigA4Mask")
+const arm_2d_tile_t c_tileQuaterArcBigA4Mask = {
     .tRegion = {
         .tSize = {
             .iWidth = 240,
@@ -17955,7 +17955,7 @@ const arm_2d_tile_t c_tileQuaterArcBitA4Mask = {
             .chScheme = ARM_2D_COLOUR_MASK_A4,
         },
     },
-    .pchBuffer = (uint8_t *)c_bmpQuaterArcBitA4Alpha,
+    .pchBuffer = (uint8_t *)c_bmpQuaterArcBigA4Alpha,
 };
 
 
