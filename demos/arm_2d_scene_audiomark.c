@@ -251,7 +251,6 @@ static void __before_scene_audiomark_switching_out(arm_2d_scene_t *ptScene)
 {
     user_scene_audiomark_t *ptThis = (user_scene_audiomark_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
-
 }
 
 void __draw_processor_list_item(user_scene_audiomark_t *ptThis,
@@ -532,7 +531,7 @@ user_scene_audiomark_t *__arm_2d_scene_audiomark_init(   arm_2d_scene_player_t *
             //.fnOnBGStart    = &__on_scene_audiomark_background_start,
             //.fnOnBGComplete = &__on_scene_audiomark_background_complete,
             .fnOnFrameStart = &__on_scene_audiomark_frame_start,
-            //.fnBeforeSwitchOut = &__before_scene_audiomark_switching_out,
+            .fnBeforeSwitchOut = &__before_scene_audiomark_switching_out,
             .fnOnFrameCPL   = &__on_scene_audiomark_frame_complete,
             .fnDepose       = &__on_scene_audiomark_depose,
         },

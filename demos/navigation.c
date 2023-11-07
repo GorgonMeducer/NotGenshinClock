@@ -119,7 +119,7 @@ IMPL_PFB_ON_DRAW(__disp_adapter0_draw_navigation)
                 
                 draw_round_corner_box(  ptTile, 
                                         &__centre_region, 
-                                        GLCD_COLOR_WHITE, 
+                                        __RGB(0x56, 0xB7, 0xF3), 
                                         64,
                                         bIsNewFrame);
 
@@ -210,6 +210,9 @@ IMPL_PFB_ON_DRAW(__disp_adapter0_draw_navigation)
 
                 arm_2d_align_mid_right(__bottom_centre_region, tStringSize) {
 
+                    int32_t nLCDLatency 
+                        = (int32_t)arm_2d_helper_convert_ticks_to_ms(
+                            DISP0_ADAPTER.Benchmark.wLCDLatency);
 
                     __mid_right_region.tLocation.iX -= 45;
                     __mid_right_region.tLocation.iY += 5;
@@ -220,13 +223,13 @@ IMPL_PFB_ON_DRAW(__disp_adapter0_draw_navigation)
                                                     __RGB32(0, 0xFF, 0),
                                                     __RGB32(0xFF, 0, 0), 
                                                     50,
-                                                    DISP0_ADAPTER.Benchmark.wLCDLatency ));
+                                                    nLCDLatency ));
 
                     arm_lcd_text_set_colour(tColour, GLCD_COLOR_BLACK);
                     arm_lcd_text_set_font((const arm_2d_font_t *)&ARM_2D_FONT_ARIAL20_A4);
                     arm_lcd_text_set_draw_region(&__mid_right_region);
                     arm_lcd_text_location(0,0);
-                    arm_lcd_printf("%d", DISP0_ADAPTER.Benchmark.wLCDLatency);
+                    arm_lcd_printf("%d", nLCDLatency);
 
                 }
             } while(0);

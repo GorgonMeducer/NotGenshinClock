@@ -89,6 +89,16 @@ void scene_audiomark_loader(void)
     arm_2d_scene_player_set_switching_mode( &DISP0_ADAPTER,
                                             ARM_2D_SCENE_SWITCH_MODE_ERASE_RIGHT);
     arm_2d_scene_player_set_switching_period(&DISP0_ADAPTER, 2000);
+
+    extern
+    IMPL_PFB_ON_DRAW(__disp_adapter0_draw_navigation);
+
+    /* register event handler for evtOnDrawNavigation */
+    arm_2d_scene_player_register_on_draw_navigation_event_handler(
+                    &DISP0_ADAPTER,
+                    __disp_adapter0_draw_navigation,
+                    NULL);
+
     arm_2d_scene_audiomark_init(&DISP0_ADAPTER);
 }
 
@@ -97,6 +107,9 @@ void scene0_loader(void)
     arm_2d_scene_player_set_switching_mode( &DISP0_ADAPTER,
                                             ARM_2D_SCENE_SWITCH_MODE_FADE_WHITE);
     arm_2d_scene_player_set_switching_period(&DISP0_ADAPTER, 3000);
+    
+extern void disp_adapter0_navigator_init(void);
+    disp_adapter0_navigator_init();
 
     arm_2d_scene0_init(&DISP0_ADAPTER);
 }
@@ -143,6 +156,7 @@ void scene_clock_loader(void)
 typedef void scene_loader_t(void);
 
 static scene_loader_t * const c_SceneLoaders[] = {
+#if 1
     scene0_loader,
     scene1_loader,
     scene_meter_loader,
@@ -151,7 +165,7 @@ static scene_loader_t * const c_SceneLoaders[] = {
     scene4_loader,
     //scene2_loader,
     scene_fitness_loader,
-
+#endif
     scene_audiomark_loader,
 };
 
