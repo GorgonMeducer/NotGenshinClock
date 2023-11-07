@@ -384,16 +384,14 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_audiomark_handler)
                                                 &c_tileAudioPOVGRAY8, 
                                                 (__arm_2d_color_t){GLCD_COLOR_WHITE});
 
-
-
-                    arm_lcd_text_set_colour(GLCD_COLOR_WHITE, GLCD_COLOR_WHITE);
+                    arm_lcd_text_set_target_framebuffer(NULL);
+                    arm_lcd_text_set_colour(GLCD_COLOR_WHITE, GLCD_COLOR_BLACK);
                     arm_lcd_print_banner("Animated Benchmark Data: AudioMark", __item_region, &ARM_2D_FONT_ARIAL20_A4);
 
                     arm_2d_align_bottom_right(__item_region, 300, 70) {
                         arm_lcd_text_set_target_framebuffer(NULL);
                         arm_lcd_text_set_colour(GLCD_COLOR_GREEN, GLCD_COLOR_WHITE);
                         arm_lcd_text_set_font((const arm_2d_font_t *)(&ARM_2D_FONT_6x8));
-
                         
                         arm_lcd_text_set_draw_region(&__bottom_right_region);
                         arm_lcd_text_location(0,0);
@@ -404,8 +402,6 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_audiomark_handler)
 
                 __item_line_vertical(450, 35, 15, 15, 0, 5) {
                     __draw_processor_list_item(ptThis, ptTile, &__item_region, AUDIOMARK_CORTEX_M4, bIsNewFrame);
-                    
-                    
                 }
 
                 __item_line_vertical(450, 35, 15, 15, 5, 5) {
