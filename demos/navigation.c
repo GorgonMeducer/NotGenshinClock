@@ -143,8 +143,8 @@ IMPL_PFB_ON_DRAW(__disp_adapter0_draw_navigation)
                         arm_lcd_text_location(0,0);
                         arm_lcd_puts("FPS:");
 
-                        arm_lcd_text_location(0, 21);
-                        arm_lcd_puts("CPU Usage:      %");
+                        arm_lcd_text_location(0, 22);
+                        arm_lcd_puts("CPU Usage:       %");
 
                         arm_lcd_text_location(0, 50);
                         arm_lcd_puts("LCD Latency:    ms");
@@ -158,6 +158,9 @@ IMPL_PFB_ON_DRAW(__disp_adapter0_draw_navigation)
                 tStringSize.iWidth *= 2;
 
                 arm_2d_align_centre(__bottom_centre_region, tStringSize) {
+
+                    __centre_region.tLocation.iX += 10;
+
                     arm_lcd_text_set_target_framebuffer(NULL);
                     COLOUR_INT tColour = arm_2d_pixel_from_brga8888( 
                                                 __arm_2d_helper_colour_slider(
