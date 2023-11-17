@@ -104,30 +104,6 @@ extern
 struct {
     implement(arm_2d_user_font_t);
     arm_2d_char_idx_t tUTF8Table;
-} ARM_2D_FONT_ARIAL24_A4;
-
-extern
-struct {
-    implement(arm_2d_user_font_t);
-    arm_2d_char_idx_t tUTF8Table;
-} ARM_2D_FONT_ARIAL24_A2;
-
-extern
-struct {
-    implement(arm_2d_user_font_t);
-    arm_2d_char_idx_t tUTF8Table;
-} ARM_2D_FONT_ARIAL24_A1;
-
-extern
-struct {
-    implement(arm_2d_user_font_t);
-    arm_2d_char_idx_t tUTF8Table;
-} ARM_2D_FONT_ARIAL24_A8;
-
-extern
-struct {
-    implement(arm_2d_user_font_t);
-    arm_2d_char_idx_t tUTF8Table;
 } ARM_2D_FONT_ARIAL16_A4;
 
 extern const arm_2d_tile_t c_tileInnerGearMask;
@@ -243,7 +219,7 @@ static void __on_scene_audiomark_frame_complete(arm_2d_scene_t *ptScene)
     
     /* switch to next scene after 20s */
     if (arm_2d_helper_is_time_out(20000, &this.lTimestamp[0])) {
-        arm_2d_scene_player_switch_to_next_scene(ptScene->ptPlayer);
+        //arm_2d_scene_player_switch_to_next_scene(ptScene->ptPlayer);
     }
 }
 
@@ -251,6 +227,7 @@ static void __before_scene_audiomark_switching_out(arm_2d_scene_t *ptScene)
 {
     user_scene_audiomark_t *ptThis = (user_scene_audiomark_t *)ptScene;
     ARM_2D_UNUSED(ptThis);
+
 }
 
 void __draw_processor_list_item(user_scene_audiomark_t *ptThis,
@@ -383,14 +360,16 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_audiomark_handler)
                                                 &c_tileAudioPOVGRAY8, 
                                                 (__arm_2d_color_t){GLCD_COLOR_WHITE});
 
-                    arm_lcd_text_set_target_framebuffer(NULL);
-                    arm_lcd_text_set_colour(GLCD_COLOR_WHITE, GLCD_COLOR_BLACK);
+
+
+                    arm_lcd_text_set_colour(GLCD_COLOR_WHITE, GLCD_COLOR_WHITE);
                     arm_lcd_print_banner("Animated Benchmark Data: AudioMark", __item_region, &ARM_2D_FONT_ARIAL20_A4);
 
                     arm_2d_align_bottom_right(__item_region, 300, 70) {
                         arm_lcd_text_set_target_framebuffer(NULL);
                         arm_lcd_text_set_colour(GLCD_COLOR_GREEN, GLCD_COLOR_WHITE);
                         arm_lcd_text_set_font((const arm_2d_font_t *)(&ARM_2D_FONT_6x8));
+
                         
                         arm_lcd_text_set_draw_region(&__bottom_right_region);
                         arm_lcd_text_location(0,0);
@@ -401,6 +380,8 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_audiomark_handler)
 
                 __item_line_vertical(450, 35, 15, 15, 0, 5) {
                     __draw_processor_list_item(ptThis, ptTile, &__item_region, AUDIOMARK_CORTEX_M4, bIsNewFrame);
+                    
+                    
                 }
 
                 __item_line_vertical(450, 35, 15, 15, 5, 5) {
@@ -464,27 +445,12 @@ user_scene_audiomark_t *__arm_2d_scene_audiomark_init(   arm_2d_scene_player_t *
     bool bUserAllocated = false;
     assert(NULL != ptDispAdapter);
 
-#if 0
+#if 1
     /*! define dirty regions */
     IMPL_ARM_2D_REGION_LIST(s_tDirtyRegions, static)
 
-        /* a dirty region to be specified at runtime*/
-        ADD_REGION_TO_LIST(s_tDirtyRegions,
-            0  /* initialize at runtime later */
-        ),
-        
-        /* add the last region:
-         * it is the top left corner for text display 
-         */
         ADD_LAST_REGION_TO_LIST(s_tDirtyRegions,
-            .tLocation = {
-                .iX = 0,
-                .iY = 0,
-            },
-            .tSize = {
-                .iWidth = 0,
-                .iHeight = 8,
-            },
+            0
         ),
 
     END_IMPL_ARM_2D_REGION_LIST(s_tDirtyRegions)
@@ -500,12 +466,11 @@ user_scene_audiomark_t *__arm_2d_scene_audiomark_init(   arm_2d_scene_player_t *
      * this demo shows that we create a region in the centre of a screen(320*240)
      * for a image stored in the tile c_tileCMSISLogoMask
      */
-    arm_2d_align_centre(tScreen, c_tileCMSISLogoMask.tRegion.tSize) {
-        s_tDirtyRegions[0].tRegion = __centre_region;
-    }
-
-    s_tDirtyRegions[dimof(s_tDirtyRegions)-1].tRegion.tSize.iWidth 
-                                                        = tScreen.tSize.iWidth;
+    arm_2d_align_bottom_centre(tScreen, tScreen.tSize.iWidth, tScreen.tSize.iHeight >> 1) {
+        arm_2d_align_centre(__bottom_centre_region, 415, 415) {
+            s_tDirtyRegions[0].tRegion = __centre_region;
+        }
+    } 
 #endif
 
     if (NULL == ptThis) {
@@ -531,7 +496,7 @@ user_scene_audiomark_t *__arm_2d_scene_audiomark_init(   arm_2d_scene_player_t *
             //.fnOnBGStart    = &__on_scene_audiomark_background_start,
             //.fnOnBGComplete = &__on_scene_audiomark_background_complete,
             .fnOnFrameStart = &__on_scene_audiomark_frame_start,
-            .fnBeforeSwitchOut = &__before_scene_audiomark_switching_out,
+            //.fnBeforeSwitchOut = &__before_scene_audiomark_switching_out,
             .fnOnFrameCPL   = &__on_scene_audiomark_frame_complete,
             .fnDepose       = &__on_scene_audiomark_depose,
         },
@@ -550,7 +515,7 @@ user_scene_audiomark_t *__arm_2d_scene_audiomark_init(   arm_2d_scene_player_t *
                             c_tProcessorInfo[n].iWheelSize, 
                             c_tProcessorInfo[n].tColour,
                             GLCD_COLOR_WHITE,
-                            NULL);
+                            &this.use_as__arm_2d_scene_t.ptDirtyRegion);
                 break;
             case AUDIOMARK_CORTEX_M55_HELIUM:
             case AUDIOMARK_CORTEX_M85_SCALER:
@@ -561,7 +526,7 @@ user_scene_audiomark_t *__arm_2d_scene_audiomark_init(   arm_2d_scene_player_t *
                     GLCD_COLOR_WHITE,
                     &c_tileQuaterArcBigMask,
                     &c_tileBigWhiteDotMask,
-                    NULL);
+                    &this.use_as__arm_2d_scene_t.ptDirtyRegion);
                 break;
             default:
                 assert(false);
@@ -602,5 +567,4 @@ user_scene_audiomark_t *__arm_2d_scene_audiomark_init(   arm_2d_scene_player_t *
 #if defined(__clang__)
 #   pragma clang diagnostic pop
 #endif
-
 
