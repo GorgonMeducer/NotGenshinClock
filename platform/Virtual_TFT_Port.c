@@ -214,6 +214,9 @@ void VT_deinit(void)
 
 int32_t Disp0_DrawBitmap(int16_t x,int16_t y,int16_t width,int16_t height,const uint8_t *bitmap)
 {
+    assert(0 == (x & _BV(0)));
+    assert(0 == (width & _BV(0)));
+    
     VT_Fill_Multiple_Colors(x, y,x+width-1,y+height-1,(color_typedef*) bitmap);
 
     return 0;
