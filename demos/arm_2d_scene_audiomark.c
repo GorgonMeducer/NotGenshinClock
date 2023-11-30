@@ -246,14 +246,14 @@ void __draw_processor_list_item(user_scene_audiomark_t *ptThis,
 
         arm_2d_layout(__processor_bar_canvas) {
 
-            __item_line_horizontal(160, __processor_bar_canvas.tSize.iHeight) {
+            __item_line_dock_horizontal(160) {
                 arm_lcd_text_set_target_framebuffer((arm_2d_tile_t *)&__processor_bar);
 
                 arm_lcd_text_set_colour(__RGB(0x56, 0xB7, 0xF3), GLCD_COLOR_WHITE);
                 arm_lcd_print_banner(this.Processor[chIndex].pchName, __item_region, &ARM_2D_FONT_ARIAL16_A4);
             }
 
-            __item_line_horizontal(200, __processor_bar_canvas.tSize.iHeight) {
+            __item_line_dock_horizontal(200) {
 
                progress_bar_drill_show( &__processor_bar,
                                         &__item_region,
@@ -262,13 +262,13 @@ void __draw_processor_list_item(user_scene_audiomark_t *ptThis,
                                         bIsNewFrame);
             }
 
-            __item_line_horizontal(100, __processor_bar_canvas.tSize.iHeight, 10, 0, 0, 0) {
+            __item_line_dock_horizontal(100, 10, 0, 0, 0) {
 
-                arm_2d_align_centre(__item_region, __item_region.tSize.iWidth, c_tProcessorInfo[chIndex].ptScoreFont->tCharSize.iHeight) {
+                arm_2d_dock_vertical(__item_region, c_tProcessorInfo[chIndex].ptScoreFont->tCharSize.iHeight) {
                     arm_lcd_text_set_target_framebuffer((arm_2d_tile_t *)&__processor_bar);
                     arm_lcd_text_set_colour(c_tProcessorInfo[chIndex].tScoreColour, GLCD_COLOR_WHITE);
                     arm_lcd_text_set_font((const arm_2d_font_t *)(c_tProcessorInfo[chIndex].ptScoreFont));
-                    arm_lcd_text_set_draw_region(&__centre_region);
+                    arm_lcd_text_set_draw_region(&__vertical_region);
                     arm_lcd_text_location(0,0);
                     arm_lcd_printf("%1.2f", (float)c_tProcessorInfo[chIndex].iAudioMark / 100.0f);
                 }
@@ -276,8 +276,6 @@ void __draw_processor_list_item(user_scene_audiomark_t *ptThis,
             }
 
         }
-
-
     }
 
 }
@@ -349,9 +347,9 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_audiomark_handler)
         } while(0);
 
 
-        arm_2d_align_top_centre(__top_canvas, tScreenSize.iWidth, tScreenSize.iHeight >> 1) {
+        arm_2d_dock_top(__top_canvas, tScreenSize.iHeight >> 1) {
         
-            arm_2d_layout(__top_canvas) {
+            arm_2d_layout(__top_region) {
                 __item_line_vertical(c_tileAudioPOVGRAY8.tRegion.tSize) {
                     
                     arm_2d_fill_colour_with_mask(   
@@ -380,8 +378,6 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_audiomark_handler)
 
                 __item_line_vertical(450, 35, 15, 15, 0, 5) {
                     __draw_processor_list_item(ptThis, ptTile, &__item_region, AUDIOMARK_CORTEX_M4, bIsNewFrame);
-                    
-                    
                 }
 
                 __item_line_vertical(450, 35, 15, 15, 5, 5) {
@@ -408,13 +404,13 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_audiomark_handler)
         }
 
 
-        arm_2d_align_bottom_centre(__top_canvas, tScreenSize.iWidth, tScreenSize.iHeight >> 1) {
+        arm_2d_dock_bottom(__top_canvas, tScreenSize.iHeight >> 1) {
             
             for (int_fast8_t n = 0; n < dimof(this.Processor); n++) {
 
                 progress_wheel_show(&this.Processor[n].tWheel,
                     ptTile, 
-                    &__bottom_centre_region,       
+                    &__bottom_region,       
                     this.Processor[n].iProgress,
                     255,
                     bIsNewFrame);
@@ -424,7 +420,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_audiomark_handler)
             /* show nebula */
             dynamic_nebula_show(&this.tNebula, 
                                 ptTile, 
-                                &__bottom_centre_region, 
+                                &__bottom_region, 
                                 GLCD_COLOR_WHITE, 
                                 255,
                                 bIsNewFrame);
@@ -490,7 +486,7 @@ user_scene_audiomark_t *__arm_2d_scene_audiomark_init(   arm_2d_scene_player_t *
             /* Please uncommon the callbacks if you need them
              */
             .fnScene        = &__pfb_draw_scene_audiomark_handler,
-            //.ptDirtyRegion  = (arm_2d_region_list_item_t *)s_tDirtyRegions,
+            .ptDirtyRegion  = (arm_2d_region_list_item_t *)s_tDirtyRegions,
             
 
             //.fnOnBGStart    = &__on_scene_audiomark_background_start,
@@ -514,8 +510,8 @@ user_scene_audiomark_t *__arm_2d_scene_audiomark_init(   arm_2d_scene_player_t *
                 progress_wheel_init(&this.Processor[n].tWheel, 
                             c_tProcessorInfo[n].iWheelSize, 
                             c_tProcessorInfo[n].tColour,
-                            GLCD_COLOR_WHITE,
-                            &this.use_as__arm_2d_scene_t.ptDirtyRegion);
+                            GLCD_COLOR_WHITE, NULL);
+                            //&this.use_as__arm_2d_scene_t.ptDirtyRegion);
                 break;
             case AUDIOMARK_CORTEX_M55_HELIUM:
             case AUDIOMARK_CORTEX_M85_SCALER:
@@ -525,8 +521,8 @@ user_scene_audiomark_t *__arm_2d_scene_audiomark_init(   arm_2d_scene_player_t *
                     c_tProcessorInfo[n].tColour,
                     GLCD_COLOR_WHITE,
                     &c_tileQuaterArcBigMask,
-                    &c_tileBigWhiteDotMask,
-                    &this.use_as__arm_2d_scene_t.ptDirtyRegion);
+                    &c_tileBigWhiteDotMask, NULL);
+                    //&this.use_as__arm_2d_scene_t.ptDirtyRegion);
                 break;
             default:
                 assert(false);
