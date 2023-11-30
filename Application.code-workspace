@@ -6,7 +6,8 @@
 	],
 	"settings": {
 		"files.associations": {
-			"cmsis_gcc.h": "c"
+			"cmsis_gcc.h": "c",
+			"chrono": "c"
 		},
 		"sarif-viewer.connectToGithubCodeScanning": "off",
 		"cSpell.words": [
