@@ -70,13 +70,13 @@ extern "C" {
 // <o>Width of the PFB block
 // <i> The width of your PFB block size used in disp0
 #ifndef __DISP0_CFG_PFB_BLOCK_WIDTH__
-#   define __DISP0_CFG_PFB_BLOCK_WIDTH__                           480
+#   define __DISP0_CFG_PFB_BLOCK_WIDTH__                           __DISP0_CFG_SCEEN_WIDTH__
 #endif
 
 // <o>Height of the PFB block
 // <i> The height of your PFB block size used in disp0
 #ifndef __DISP0_CFG_PFB_BLOCK_HEIGHT__
-#   define __DISP0_CFG_PFB_BLOCK_HEIGHT__                          415
+#   define __DISP0_CFG_PFB_BLOCK_HEIGHT__                          (__DISP0_CFG_SCEEN_HEIGHT__/10)
 #endif
 
 // <o>Width Alignment of generated PFBs
@@ -90,7 +90,7 @@ extern "C" {
 //     <7=>   128 pixel
 // <i> Make sure the x and width of the PFB is always aligned to 2^n pixels
 #ifndef __DISP0_CFG_PFB_PIXEL_ALIGN_WIDTH__
-#   define __DISP0_CFG_PFB_PIXEL_ALIGN_WIDTH__                     1
+#   define __DISP0_CFG_PFB_PIXEL_ALIGN_WIDTH__                     0
 #endif
 
 // <o>Height Alignment of generated PFBs
@@ -104,7 +104,7 @@ extern "C" {
 //     <7=>   128 pixel
 // <i> Make sure the y and height of the PFB is always aligned to 2^n pixels
 #ifndef __DISP0_CFG_PFB_PIXEL_ALIGN_HEIGHT__
-#   define __DISP0_CFG_PFB_PIXEL_ALIGN_HEIGHT__                    0
+#   define __DISP0_CFG_PFB_PIXEL_ALIGN_HEIGHT__                    2
 #endif
 
 // <o>PFB Block Count <1-65535>
@@ -116,7 +116,7 @@ extern "C" {
 // <o>Number of iterations <0-2000>
 // <i> run number of iterations before calculate the FPS.
 #ifndef __DISP0_CFG_ITERATION_CNT__
-#   define __DISP0_CFG_ITERATION_CNT__                             30
+#   define __DISP0_CFG_ITERATION_CNT__                             60
 #endif
 
 // <o>FPS Calculation Mode
@@ -149,6 +149,16 @@ extern "C" {
 // <i> Swap the high and low bytes of the 16bit-pixels
 #ifndef __DISP0_CFG_SWAP_RGB16_HIGH_AND_LOW_BYTES__
 #   define __DISP0_CFG_SWAP_RGB16_HIGH_AND_LOW_BYTES__             0
+#endif
+
+// <o>Rotate the Screen
+//     <0=>    NO Rotate
+//     <1=>    90 Degree
+//     <2=>   180 Degree
+//     <3=>   270 Degree
+// <i> Rotate the Screen for specified degrees.
+#ifndef __DISP0_CFG_ROTATE_SCREEN__
+#   define __DISP0_CFG_ROTATE_SCREEN__                             0
 #endif
 
 // <q>Enable the helper service for Asynchronous Flushing
@@ -190,6 +200,16 @@ extern "C" {
 #endif
 // <<< end of configuration section >>>
 
+
+#ifndef __DISP0_COLOUR_FORMAT__
+#   if      __DISP0_CFG_COLOUR_DEPTH__ == 8
+#       define __DISP0_COLOUR_FORMAT__  ARM_2D_COLOUR_GRAY8
+#   elif    __DISP0_CFG_COLOUR_DEPTH__ == 16
+#       define __DISP0_COLOUR_FORMAT__  ARM_2D_COLOUR_RGB565
+#   elif    __DISP0_CFG_COLOUR_DEPTH__ == 32
+#       define __DISP0_COLOUR_FORMAT__  ARM_2D_COLOUR_CCCN888
+#   endif
+#endif
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 
@@ -326,9 +346,8 @@ void __disp_adapter0_vres_read_memory( intptr_t pObj,
 
 /*!
  * \brief An user implemented interface for DMA memory-to-memory copy.
- *        If you have a DMA, you can implement this function by using
- *        __OVERRIDE_WEAK. 
  *        You should implement an ISR for copy-complete event and call
+ *        disp_adapter0_insert_dma_copy_complete_event_handler() or
  *        arm_2d_helper_3fb_report_dma_copy_complete() to notify the 
  *        3FB (direct mode) helper service.
  * 
@@ -357,6 +376,10 @@ void __disp_adapter0_request_dma_copy(  arm_2d_helper_3fb_t *ptThis,
  * \param[in] iHeight the safe height of the source image
  * \retval true the 2D copy is complete when leaving this function
  * \retval false An async 2D copy request is sent to the DMA
+ *
+ * \note if false is replied, you have to call 
+ *       disp_adapter0_insert_2d_copy_complete_event_handler() to report
+ *       the completion of the 2d-copy. 
  */
 bool __disp_adapter0_request_2d_copy(   arm_2d_helper_3fb_t *ptThis,
                                         void *pObj,

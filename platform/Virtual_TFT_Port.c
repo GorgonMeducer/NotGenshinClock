@@ -102,8 +102,7 @@ static void monitor_sdl_init(void)
 
     SDL_SetEventFilter(quit_filter, NULL);
 
-    window = SDL_CreateWindow(  
-                                "Arm-2D v" 
+    window = SDL_CreateWindow( "Arm-2D v" 
                                 ARM_TO_STRING(ARM_2D_VERSION_MAJOR)
                                 "."
                                 ARM_TO_STRING(ARM_2D_VERSION_MINOR)
@@ -142,7 +141,7 @@ void VT_sdl_refresh_task(void)
 {
     if(sdl_refr_qry != false)
     {
-        if (arm_2d_helper_is_time_out(1000/30)) 
+        if (arm_2d_helper_is_time_out(1000/60)) 
         {
             sdl_refr_qry = false;
             SDL_UpdateTexture(texture, NULL, tft_fb, VT_WIDTH * sizeof(uint32_t));
@@ -214,9 +213,6 @@ void VT_deinit(void)
 
 int32_t Disp0_DrawBitmap(int16_t x,int16_t y,int16_t width,int16_t height,const uint8_t *bitmap)
 {
-    assert(0 == (x & _BV(0)));
-    assert(0 == (width & _BV(0)));
-    
     VT_Fill_Multiple_Colors(x, y,x+width-1,y+height-1,(color_typedef*) bitmap);
 
     return 0;

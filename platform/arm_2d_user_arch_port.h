@@ -37,8 +37,6 @@
 
 /*============================ MACROS ========================================*/
 
-
-
 #if defined (_MSC_VER) 
 #   include <stdint.h>
 #   define __STATIC_FORCEINLINE static __forceinline
