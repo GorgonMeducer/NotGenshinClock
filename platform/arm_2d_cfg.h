@@ -21,7 +21,9 @@
 
 /*============================ INCLUDES ======================================*/
 
-#include "RTE_Components.h"
+#if defined(_RTE_)
+#   include "RTE_Components.h"
+#endif
 
 #ifdef   __cplusplus
 extern "C" {
@@ -55,6 +57,48 @@ extern "C" {
 // <i> This feature is disabled by default to save code size
 #ifndef __ARM_2D_CFG_SUPPORT_COLOUR_CHANNEL_ACCESS__
 #   define __ARM_2D_CFG_SUPPORT_COLOUR_CHANNEL_ACCESS__             1
+#endif
+// </h>
+
+// <h>Log and Debug
+// =======================
+// <q>Enable Log
+// <i> This feature is disabled by default.
+#ifndef __ARM_2D_CFG_ENABLE_LOG__
+#   define __ARM_2D_CFG_ENABLE_LOG__                                0
+#endif
+
+// <q>The terminal support colour
+// <i> The terminal is compatible with VT100 and support colour display. This feature is disabled by default.
+#ifndef __ARM_2D_CFG_LOG_OUTPUT_SUPPORT_COLOUR__
+#   define __ARM_2D_CFG_LOG_OUTPUT_SUPPORT_COLOUR__                 0
+#endif
+
+// <o>The maximum length of log string <64-65535>
+// <i> The number of bytes requested from heap during log output
+// <i> Default: 256
+#ifndef __ARM_2D_LOG_MAX_STRING_LEN__
+#   define __ARM_2D_LOG_MAX_STRING_LEN__        256
+#endif
+
+/* The filter of log channels. Please comment the channels that you want to mask.
+ */
+#ifndef __ARM_2D_LOG_CHANNEL_MASK_FILTER__
+
+#   define __ARM_2D_LOG_CHANNEL_MASK_FILTER__                                   \
+            (   ARM_2D_LOG_CHN_TYPE_USER                                        \
+            |   ARM_2D_LOG_CHN_TYPE_INFO                                        \
+            |   ARM_2D_LOG_CHN_TYPE_WARNING                                     \
+            |   ARM_2D_LOG_CHN_TYPE_ERROR                                       \
+            |   ARM_2D_LOG_CHN_PIPELINE                                         \
+            |   ARM_2D_LOG_CHN_OPCODE                                           \
+            |   ARM_2D_LOG_CHN_HELPER                                           \
+            |   ARM_2D_LOG_CHN_HELPER_PFB                                       \
+            |   ARM_2D_LOG_CHN_SCENE_PLAYER                                     \
+            |   ARM_2D_LOG_CHN_DIRTY_REGION_OPTIMISATION                        \
+            |   ARM_2D_LOG_CHN_STATISTICS                                       \
+            |   ARM_2D_LOG_CHN_APP)
+
 #endif
 // </h>
 
@@ -99,20 +143,6 @@ extern "C" {
 #   define __GLCD_CFG_COLOUR_DEPTH__                                    16
 #endif
 
-// <o>Width of the screen <8-32767>
-// <i> The width of your screen
-// <i> Default: 320
-#ifndef __GLCD_CFG_SCEEN_WIDTH__
-#   define __GLCD_CFG_SCEEN_WIDTH__                                     800
-#endif
-
-// <o>Height of the screen <8-32767>
-// <i> The height of your screen
-// <i> Default: 240
-#ifndef __GLCD_CFG_SCEEN_HEIGHT__
-#   define __GLCD_CFG_SCEEN_HEIGHT__                                    480
-#endif
-
 // <o> The size of the LCD printf text buffer <16-65535>
 // <i> The text buffer size for the lcd printf service. It determins how many character you can use in one printf string.
 #ifndef __LCD_PRINTF_CFG_TEXT_BUFFER_SIZE__
@@ -120,6 +150,20 @@ extern "C" {
 #endif
 
 // <h>Benchmark
+
+// <o>Width of the screen <8-32767>
+// <i> The width of your screen for running benchmark
+// <i> Default: 320
+#ifndef __GLCD_CFG_SCEEN_WIDTH__
+#   define __GLCD_CFG_SCEEN_WIDTH__                                     800
+#endif
+
+// <o>Height of the screen <8-32767>
+// <i> The height of your screen for running benchmark
+// <i> Default: 240
+#ifndef __GLCD_CFG_SCEEN_HEIGHT__
+#   define __GLCD_CFG_SCEEN_HEIGHT__                                    480
+#endif
 
 // <o>Number of iterations <1-2000>
 // <i> run number of iterations in arm-2d benchmark before calculating the result.
