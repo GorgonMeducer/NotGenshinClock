@@ -22,6 +22,7 @@ CC_INC  += Arm-2D/examples/common/controls
 
 CC_DEF  := ARM_SECTION\(x\)=
 CC_DEF  += __va_list=va_list
+CC_DEF  += _RTE_=1
 
 #======================================================================================================================#
 ifeq ($(OS),Windows_NT)
@@ -76,6 +77,7 @@ CCFLAG  +=  -Wno-macro-redefined
 CCFLAG  += 	-Ofast
 CCFLAG  +=  -flto
 LDFLAG  +=  -flto
+LDFLAG  +=  -lpthread
 
 #======================================================================================================================#
 .DEFAULT_GOAL = all
