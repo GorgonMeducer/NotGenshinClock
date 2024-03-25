@@ -26,9 +26,9 @@
 #   include "arm_2d_benchmark.h"
 #endif
 
-#include "demos/arm_2d_scene_meter.h"
-#include "demos/arm_2d_scene_watch.h"
-#include "demos/arm_2d_scene_fitness.h"
+#include "arm_2d_scene_meter.h"
+#include "arm_2d_scene_watch.h"
+#include "arm_2d_scene_fitness.h"
 #include "demos/arm_2d_scene_audiomark.h"
 
 #include "genshin_clock/arm_2d_scene_genshin_clock.h"

@@ -97,6 +97,7 @@ extern "C" {
             |   ARM_2D_LOG_CHN_SCENE_PLAYER                                     \
             |   ARM_2D_LOG_CHN_DIRTY_REGION_OPTIMISATION                        \
             |   ARM_2D_LOG_CHN_STATISTICS                                       \
+            |   ARM_2D_LOG_CHN_CONTROLS                                         \
             |   ARM_2D_LOG_CHN_APP)
 
 #endif
@@ -140,7 +141,7 @@ extern "C" {
 //     <32=>    32Bits
 // <i> The colour depth of your LCD
 // <i> Default: 16
-#   define __GLCD_CFG_COLOUR_DEPTH__                                    32
+#   define __GLCD_CFG_COLOUR_DEPTH__                                    16
 #endif
 
 // <o> The size of the LCD printf text buffer <16-65535>
@@ -162,7 +163,7 @@ extern "C" {
 // <i> The height of your screen for running benchmark
 // <i> Default: 240
 #ifndef __GLCD_CFG_SCEEN_HEIGHT__
-#   define __GLCD_CFG_SCEEN_HEIGHT__                                    854
+#   define __GLCD_CFG_SCEEN_HEIGHT__                                    480
 #endif
 
 // <o>Number of iterations <1-2000>

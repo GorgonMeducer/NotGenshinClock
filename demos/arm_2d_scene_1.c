@@ -26,7 +26,7 @@
 #include "arm_2d_scene_1.h"
 
 #include "arm_2d_helper.h"
-#include "arm_extra_controls.h"
+#include "arm_2d_example_controls.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -120,7 +120,7 @@ static void __on_scene1_depose(arm_2d_scene_t *ptScene)
     }
 
     if (this.bUserAllocated) {
-        free(ptScene);
+        __arm_2d_free_scratch_memory(ARM_2D_MEM_TYPE_UNSPECIFIED, ptScene);
     }
 }
 
@@ -268,7 +268,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene1_handler)
         arm_lcd_text_set_draw_region(NULL);
         arm_lcd_text_set_colour(GLCD_COLOR_RED, GLCD_COLOR_WHITE);
         arm_lcd_text_location(0,0);
-        arm_lcd_puts("Scene 0");
+        arm_lcd_printf("scene 1");
     }
 
     /*-----------------------draw the foreground end  -----------------------*/
@@ -313,7 +313,10 @@ user_scene_1_t *__arm_2d_scene1_init(   arm_2d_scene_player_t *ptDispAdapter,
     s_tDirtyRegions[dimof(s_tDirtyRegions)-1].ptNext = NULL;
 
     if (NULL == ptScene) {
-        ptScene = (user_scene_1_t *)malloc(sizeof(user_scene_1_t));
+        ptScene = (user_scene_1_t *)
+                    __arm_2d_allocate_scratch_memory(   sizeof(user_scene_1_t),
+                                                        __alignof__(user_scene_1_t),
+                                                        ARM_2D_MEM_TYPE_UNSPECIFIED);
         assert(NULL != ptScene);
         if (NULL == ptScene) {
             return NULL;

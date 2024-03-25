@@ -26,7 +26,7 @@
 #include "arm_2d_scene_5.h"
 
 #include "arm_2d_helper.h"
-#include "arm_extra_controls.h"
+#include "arm_2d_example_controls.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -202,7 +202,7 @@ my_list_item_t s_tListArray[] = {
 
 #define ITEM_BG_OPACITY     (255)
 
-#define RADIUS     300.0f
+#define RADIUS      480.0f
 
 static 
 arm_fsm_rt_t __list_view_item_0_draw_item( 
@@ -216,7 +216,6 @@ arm_fsm_rt_t __list_view_item_0_draw_item(
     ARM_2D_UNUSED(bIsNewFrame);
     ARM_2D_UNUSED(ptTile);
     ARM_2D_UNUSED(ptParam);
-
 
     uint8_t chOpacity = arm_2d_helper_alpha_mix(ITEM_BG_OPACITY, ptParam->chOpacity);
     int32_t q7ScaleRatio = ((ptParam->chOpacity >> 1) + 128);
@@ -415,7 +414,7 @@ static void __on_scene5_depose(arm_2d_scene_t *ptScene)
     progress_wheel_depose(&this.tWheel);
 
     if (!this.bUserAllocated) {
-        free(ptScene);
+        __arm_2d_free_scratch_memory(ARM_2D_MEM_TYPE_UNSPECIFIED, ptScene);
     }
 }
 
@@ -441,7 +440,6 @@ static void __on_scene5_background_complete(arm_2d_scene_t *ptScene)
 static void __on_scene5_frame_start(arm_2d_scene_t *ptScene)
 {
     user_scene_5_t *ptThis = (user_scene_5_t *)ptScene;
-    ARM_2D_UNUSED(ptThis);
 
     int nResult;
     if (arm_2d_helper_time_liner_slider(0, 1000, 10000, &nResult, &this.lTimestamp[2])) {
@@ -449,6 +447,7 @@ static void __on_scene5_frame_start(arm_2d_scene_t *ptScene)
     }
     this.iProgress = (int16_t)nResult;
 
+    progress_wheel_on_frame_start(&this.tWheel);
 }
 
 static void __on_scene5_frame_complete(arm_2d_scene_t *ptScene)
@@ -520,7 +519,10 @@ user_scene_5_t *__arm_2d_scene5_init(   arm_2d_scene_player_t *ptDispAdapter,
     assert(NULL != ptDispAdapter);
 
     if (NULL == ptThis) {
-        ptThis = (user_scene_5_t *)malloc(sizeof(user_scene_5_t));
+        ptThis = (user_scene_5_t *)
+                    __arm_2d_allocate_scratch_memory(   sizeof(user_scene_5_t),
+                                                        __alignof__(user_scene_5_t),
+                                                        ARM_2D_MEM_TYPE_UNSPECIFIED);
         assert(NULL != ptThis);
         if (NULL == ptThis) {
             return NULL;
@@ -534,35 +536,22 @@ user_scene_5_t *__arm_2d_scene5_init(   arm_2d_scene_player_t *ptDispAdapter,
     IMPL_ARM_2D_REGION_LIST(s_tDirtyRegions, static)
 
         /* a dirty region to be specified at runtime*/
-        ADD_REGION_TO_LIST(s_tDirtyRegions,
+        ADD_LAST_REGION_TO_LIST(s_tDirtyRegions,
             .tSize = {
                 0, 200,
             },
         ),
         
-        /* add the last region:
-         * it is the top left corner for text display 
-         */
-        ADD_LAST_REGION_TO_LIST(s_tDirtyRegions,
-            .tLocation = {
-                .iX = 0,
-                .iY = 0,
-            },
-            .tSize = {
-                .iWidth = 60,
-                .iHeight = 8,
-            },
-        ),
     END_IMPL_ARM_2D_REGION_LIST(s_tDirtyRegions)
     
+    s_tDirtyRegions[dimof(s_tDirtyRegions)-1].ptNext = NULL;
+
     /* get the screen region */
     arm_2d_region_t tScreen
         = arm_2d_helper_pfb_get_display_area(
             &ptDispAdapter->use_as__arm_2d_helper_pfb_t);
     
     /* initialise dirty region 0 at runtime
-     * this demo shows that we create a region in the centre of a screen(320*240)
-     * for a image stored in the tile c_tileCMSISLogoMask
      */
     s_tDirtyRegions[0].tRegion.tLocation = (arm_2d_location_t){
         .iX = 0,
@@ -588,7 +577,18 @@ user_scene_5_t *__arm_2d_scene5_init(   arm_2d_scene_player_t *ptDispAdapter,
         .bUserAllocated = bUserAllocated,
     };
 
-    progress_wheel_init(&this.tWheel, 60, GLCD_COLOR_GREEN);
+    do {
+        progress_wheel_cfg_t tCFG = {
+            .tDotColour     = GLCD_COLOR_WHITE,         /* dot colour */
+            .tWheelColour   = GLCD_COLOR_GREEN,         /* arc colour */
+            .iWheelDiameter = 60,                       /* diameter, 0 means use the mask's original size */
+            .bUseDirtyRegions = false,                  /* use dirty regions */
+        };
+
+        progress_wheel_init(&this.tWheel, 
+                            &this.use_as__arm_2d_scene_t,
+                            &tCFG);
+    } while(0);
 
     do {
         list_view_cfg_t tCFG = {

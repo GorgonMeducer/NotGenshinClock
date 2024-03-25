@@ -10,6 +10,9 @@ CC_SRC  += $(wildcard Arm-2D/Helper/Source/*.c)
 CC_SRC  += $(wildcard Arm-2D/examples/common/asset/*.c)
 CC_SRC  += $(wildcard Arm-2D/examples/common/benchmark/*.c)
 CC_SRC  += $(wildcard Arm-2D/examples/common/controls/*.c)
+CC_SRC  += $(wildcard Arm-2D/examples/common/scenes/fitness/*.c)
+CC_SRC  += $(wildcard Arm-2D/examples/common/scenes/meter/*.c)
+CC_SRC  += $(wildcard Arm-2D/examples/common/scenes/watch/*.c)
 
 CC_INC  := .
 CC_INC  += genshin_clock
@@ -21,6 +24,9 @@ CC_INC  += Arm-2D/Library/Include
 CC_INC  += Arm-2D/Helper/Include
 CC_INC  += Arm-2D/examples/common/benchmark
 CC_INC  += Arm-2D/examples/common/controls
+CC_INC  += Arm-2D/examples/common/scenes/fitness
+CC_INC  += Arm-2D/examples/common/scenes/meter
+CC_INC  += Arm-2D/examples/common/scenes/watch
 
 CC_DEF  := ARM_SECTION\(x\)=
 CC_DEF  += __va_list=va_list

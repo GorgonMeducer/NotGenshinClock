@@ -1,12 +1,13 @@
 {
     "configurations": [
         {
-            "name": "Win32",
+            "name": "MacOS M1",
+            "compilerPath": "/usr/bin/clang",
+            "intelliSenseMode": "macos-clang-arm64",
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/sdl2/32/include",
                 "${workspaceFolder}/genshin_clock",
-                "${workspaceFolder}/demos",
                 "${workspaceFolder}/genshin_clock/resources",
                 "${workspaceFolder}/platform",
                 "${workspaceFolder}/platform/math",
@@ -14,9 +15,43 @@
                 "${workspaceFolder}/Arm-2D/Helper/Include",
                 "${workspaceFolder}/Arm-2D/Library/Include",
                 "${workspaceFolder}/Arm-2D/examples/common/benchmark",
-                "${workspaceFolder}/Arm-2D/examples/common/controls"
+                "${workspaceFolder}/Arm-2D/examples/common/controls",
+                "${workspaceFolder}/Arm-2D/examples/common/scenes/fitness",
+                "${workspaceFolder}/Arm-2D/examples/common/scenes/meter",
+                "${workspaceFolder}/Arm-2D/examples/common/scenes/watch"
             ],
             "defines": [
+                "_RTE_",
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "ARM_SECTION(x)=  ",
+                "__va_list=va_list"
+            ],
+            "cStandard": "gnu11",
+            "cppStandard": "gnu++11",
+            "macFrameworkPath": ["/System/Library/Frameworks", "/Library/Frameworks"]
+        },
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/sdl2/32/include",
+                "${workspaceFolder}/genshin_clock",
+                "${workspaceFolder}/genshin_clock/resources",
+                "${workspaceFolder}/platform",
+                "${workspaceFolder}/platform/math",
+                "${workspaceFolder}/platform/math/dsp",
+                "${workspaceFolder}/Arm-2D/Helper/Include",
+                "${workspaceFolder}/Arm-2D/Library/Include",
+                "${workspaceFolder}/Arm-2D/examples/common/benchmark",
+                "${workspaceFolder}/Arm-2D/examples/common/controls",
+                "${workspaceFolder}/Arm-2D/examples/common/scenes/fitness",
+                "${workspaceFolder}/Arm-2D/examples/common/scenes/meter",
+                "${workspaceFolder}/Arm-2D/examples/common/scenes/watch"
+            ],
+            "defines": [
+                "_RTE_",
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE",

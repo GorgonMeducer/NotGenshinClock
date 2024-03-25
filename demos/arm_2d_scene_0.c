@@ -26,7 +26,7 @@
 #include "arm_2d_scene_0.h"
 
 #include "arm_2d_helper.h"
-#include "arm_extra_controls.h"
+#include "arm_2d_example_controls.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -91,6 +91,7 @@ extern const arm_2d_tile_t c_tileCMSISLogo;
 extern const arm_2d_tile_t c_tileCMSISLogoMask;
 extern const arm_2d_tile_t c_tileCMSISLogoA2Mask;
 extern const arm_2d_tile_t c_tileCMSISLogoA4Mask;
+extern const arm_2d_tile_t c_tileCMSISLogoMask2;
 
 extern const arm_2d_tile_t c_tileBackground;
 /*============================ PROTOTYPES ====================================*/
@@ -111,7 +112,7 @@ static void __on_scene0_depose(arm_2d_scene_t *ptScene)
     }
 
     if (!this.bUserAllocated) {
-        free(ptScene);
+        __arm_2d_free_scratch_memory(ARM_2D_MEM_TYPE_UNSPECIFIED, ptScene);
     }
 }
 
@@ -173,7 +174,6 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
         
         arm_2d_fill_colour(ptTile, NULL, GLCD_COLOR_WHITE);
 
-#if 0
         arm_2d_align_centre(__top_canvas, c_tileBackground.tRegion.tSize) {
             draw_round_corner_image(&c_tileBackground,
                                     ptTile,
@@ -181,49 +181,96 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
                                     bIsNewFrame);
         }
 
+        arm_2d_align_centre(__top_canvas, 240, 120 ) {
+            arm_2d_layout(__centre_region) {
 
-        arm_2d_align_centre(__top_canvas, 200, 100 ) {
-            draw_round_corner_box(  ptTile, 
-                                    &__centre_region, 
-                                    GLCD_COLOR_WHITE, 
-                                    128,
-                                    bIsNewFrame);
-            
-            arm_2d_op_wait_async(NULL);
-            
-            draw_round_corner_border(   ptTile, 
-                                        &__centre_region, 
-                                        GLCD_COLOR_BLACK, 
-                                        (arm_2d_border_opacity_t)
-                                            {32, 32, 255-64, 255-64},
-                                        (arm_2d_corner_opacity_t)
-                                            {0, 128, 128, 128});
-                                    
+                __item_line_dock_vertical(c_tileCMSISLogoA4Mask.tRegion.tSize.iHeight, 0, 0, 0, 5) {
+                    draw_round_corner_box(  ptTile, 
+                                            &__item_region, 
+                                            GLCD_COLOR_WHITE, 
+                                            128,
+                                            bIsNewFrame);
+                    
+                    arm_2d_op_wait_async(NULL);
+
+                #if 0
+                    /* draw the cmsis logo in the centre of the screen */
+                    arm_2d_align_centre(__item_region, c_tileCMSISLogo.tRegion.tSize) {
+                        arm_2d_tile_copy_with_src_mask( &c_tileCMSISLogo,
+                                                        &c_tileCMSISLogoMask,
+                                                        ptTile,
+                                                        &__centre_region,
+                                                        ARM_2D_CP_MODE_COPY);
+                    }
+                #else
+                    /* draw the cmsis logo using mask in the centre of the screen */
+                    arm_2d_align_centre(__item_region, c_tileCMSISLogo.tRegion.tSize) {
+                    #if 1
+                        arm_2d_fill_colour_with_a4_mask_and_opacity(   
+                                                            ptTile, 
+                                                            &__centre_region, 
+                                                            &c_tileCMSISLogoA4Mask, 
+                                                            (__arm_2d_color_t){GLCD_COLOR_BLACK},
+                                                            128);
+                    #else
+                        arm_2d_fill_colour_with_mask_xy_mirror_and_opacity(   
+                                                            ptTile, 
+                                                            &__centre_region, 
+                                                            &c_tileCMSISLogoMask2, 
+                                                            (__arm_2d_color_t){GLCD_COLOR_BLACK},
+                                                            128);
+                    #endif
+                    }
+                #endif
+                    arm_2d_op_wait_async(NULL);
+
+                    draw_round_corner_border(   ptTile, 
+                                                &__item_region, 
+                                                GLCD_COLOR_BLACK, 
+                                                (arm_2d_border_opacity_t)
+                                                    {32, 32, 255-64, 255-64},
+                                                (arm_2d_corner_opacity_t)
+                                                    {0, 128, 128, 128});
+                }
+
+                __item_line_dock_vertical() {
+                    
+                    draw_round_corner_box(  ptTile, 
+                                            &__item_region, 
+                                            GLCD_COLOR_WHITE, 
+                                            255,
+                                            bIsNewFrame);
+                    
+                    arm_2d_op_wait_async(NULL);
+
+                    draw_round_corner_border(   ptTile, 
+                                                &__item_region, 
+                                                GLCD_COLOR_BLACK, 
+                                                (arm_2d_border_opacity_t)
+                                                    {32, 32, 255-64, 255-64},
+                                                (arm_2d_corner_opacity_t)
+                                                    {0, 128, 128, 128});
+
+                    arm_2d_dock_vertical(__item_region, 
+                                        ARM_2D_FONT_A8_DIGITS_ONLY
+                                            .use_as__arm_2d_user_font_t
+                                                .use_as__arm_2d_font_t
+                                                    .tCharSize.iHeight) {
+                        arm_lcd_text_set_target_framebuffer((arm_2d_tile_t *)ptTile);
+                        arm_lcd_text_set_font((const arm_2d_font_t *)&ARM_2D_FONT_A8_DIGITS_ONLY);
+                        arm_lcd_text_set_draw_region(&__vertical_region);
+                        arm_lcd_text_set_colour(GLCD_COLOR_RED, GLCD_COLOR_WHITE);
+                        arm_lcd_text_location(0,0);
+                        
+                        for (int n = 0; n < 10; n++) {
+                            arm_lcd_text_set_scale(0.5f + 0.1f * (float)n);
+                            arm_lcd_printf("%d", n);
+                        }
+                    }
+                    //arm_lcd_print_banner("1234567890", __item_region, &ARM_2D_FONT_A8_DIGITS_ONLY);
+                }
+            }                
         }
-#endif
-
-
-
-    #if 1
-        /* draw the cmsis logo in the centre of the screen */
-        arm_2d_align_centre(__top_canvas, c_tileCMSISLogo.tRegion.tSize) {
-            arm_2d_tile_copy_with_src_mask( &c_tileCMSISLogo,
-                                            &c_tileCMSISLogoMask,
-                                            ptTile,
-                                            &__centre_region,
-                                            ARM_2D_CP_MODE_COPY);
-        }
-    #else
-        /* draw the cmsis logo using mask in the centre of the screen */
-        arm_2d_align_centre(__top_canvas, c_tileCMSISLogo.tRegion.tSize) {
-            arm_2d_fill_colour_with_a4_mask_and_opacity(   
-                                                ptTile, 
-                                                &__centre_region, 
-                                                &c_tileCMSISLogoA4Mask, 
-                                                (__arm_2d_color_t){GLCD_COLOR_BLACK},
-                                                128);
-        }
-    #endif
 
         /* draw text at the top-left corner */
 
@@ -248,6 +295,7 @@ user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
     bool bUserAllocated = false;
     assert(NULL != ptDispAdapter);
 
+#if 0
     /*! define dirty regions */
     IMPL_ARM_2D_REGION_LIST(s_tDirtyRegions, static)
 
@@ -272,6 +320,8 @@ user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
 
     END_IMPL_ARM_2D_REGION_LIST(s_tDirtyRegions)
     
+    s_tDirtyRegions[dimof(s_tDirtyRegions)-1].ptNext = NULL;
+
     /* get the screen region */
     arm_2d_region_t tScreen
         = arm_2d_helper_pfb_get_display_area(
@@ -284,9 +334,13 @@ user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
     arm_2d_align_centre(tScreen, c_tileCMSISLogoMask.tRegion.tSize) {
         s_tDirtyRegions[0].tRegion = __centre_region;
     }
-    
+#endif
+
     if (NULL == ptThis) {
-        ptThis = (user_scene_0_t *)malloc(sizeof(user_scene_0_t));
+        ptThis = (user_scene_0_t *)
+                    __arm_2d_allocate_scratch_memory(   sizeof(user_scene_0_t),
+                                                        __alignof__(user_scene_0_t),
+                                                        ARM_2D_MEM_TYPE_UNSPECIFIED);
         assert(NULL != ptThis);
         if (NULL == ptThis) {
             return NULL;
@@ -301,7 +355,7 @@ user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
             /* Please uncommon the callbacks if you need them
              */
             .fnScene        = &__pfb_draw_scene0_handler,
-            .ptDirtyRegion  = (arm_2d_region_list_item_t *)s_tDirtyRegions,
+            //.ptDirtyRegion  = (arm_2d_region_list_item_t *)s_tDirtyRegions,
             
 
             //.fnOnBGStart    = &__on_scene0_background_start,
@@ -313,6 +367,7 @@ user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
         },
         .bUserAllocated = bUserAllocated,
     };
+    
 
     arm_2d_scene_player_append_scenes(  ptDispAdapter, 
                                         &this.use_as__arm_2d_scene_t, 
