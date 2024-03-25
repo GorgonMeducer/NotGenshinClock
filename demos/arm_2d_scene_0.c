@@ -63,16 +63,22 @@
 
 #if __GLCD_CFG_COLOUR_DEPTH__ == 8
 
+#   define c_tileBuff               c_tileBuffGRAY8
+#   define c_tileLenna              c_tileLennaGRAY8
 #   define c_tileCMSISLogo          c_tileCMSISLogoGRAY8
 #   define c_tileBackground         c_tileBackgroundGRAY8
 
 #elif __GLCD_CFG_COLOUR_DEPTH__ == 16
 
+#   define c_tileBuff               c_tileBuffRGB565
+#   define c_tileLenna              c_tileLennaRGB565
 #   define c_tileCMSISLogo          c_tileCMSISLogoRGB565
 #   define c_tileBackground         c_tileBackgroundRGB565
 
 #elif __GLCD_CFG_COLOUR_DEPTH__ == 32
 
+#   define c_tileBuff               c_tileBuffCCCA8888
+#   define c_tileLenna              c_tileLennaCCCN888
 #   define c_tileCMSISLogo          c_tileCMSISLogoCCCA8888
 #   define c_tileBackground         c_tileBackgroundCCCA8888
 
@@ -80,12 +86,17 @@
 #   error Unsupported colour depth!
 #endif
 
+#define DEMO_IMAGE              c_tileBuff      //c_tileLenna
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 #undef this
 #define this (*ptThis)
 
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
+
+extern const arm_2d_tile_t c_tileLenna;
+extern const arm_2d_tile_t c_tileBuff;
 
 extern const arm_2d_tile_t c_tileCMSISLogo;
 extern const arm_2d_tile_t c_tileCMSISLogoMask;
@@ -174,20 +185,118 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
         
         /* following code is just a demo, you can remove them */
         
-        arm_2d_fill_colour(ptTile, NULL, GLCD_COLOR_WHITE);
+        arm_2d_fill_colour(ptTile, &__top_canvas, GLCD_COLOR_BLACK);
+
+        /* on picture plus label */
+        arm_2d_size_t tCell = DEMO_IMAGE.tRegion.tSize;
+        tCell.iHeight += 10;
 
 
+        /* start layout */
+        arm_2d_layout(__top_canvas) {
+
+            /* cell 1, the original Lenna */
+            __item_horizontal(tCell, 2,2,2,2) {
+                
+                arm_2d_region_t __inner_canvas = __item_region;
+
+                arm_2d_layout(__inner_canvas) {
+
+                    __item_line_dock_vertical(10) {
+                        arm_2d_fill_colour(ptTile, &__item_region, GLCD_COLOR_DARK_GREY);
 
 
+                        arm_lcd_text_set_colour(GLCD_COLOR_GREEN, GLCD_COLOR_WHITE);
+                        arm_lcd_print_banner("Original", __item_region);
+                    }
 
-        /* draw text at the top-left corner */
+                    __item_line_dock_vertical(DEMO_IMAGE.tRegion.tSize.iHeight) {
 
-        arm_lcd_text_set_target_framebuffer((arm_2d_tile_t *)ptTile);
-        arm_lcd_text_set_font(&ARM_2D_FONT_6x8.use_as__arm_2d_font_t);
-        arm_lcd_text_set_draw_region(NULL);
-        arm_lcd_text_set_colour(GLCD_COLOR_RED, GLCD_COLOR_WHITE);
-        arm_lcd_text_location(0,0);
-        arm_lcd_puts("Demo for User OPCODE");
+                        arm_2d_tile_copy_only(  &DEMO_IMAGE,
+                                                ptTile,
+                                                &__item_region);
+
+                    }
+                }
+            }
+
+            /* cell 2, algorithm 1 */
+            __item_horizontal(tCell, 2,2,2,2) {
+                
+                arm_2d_region_t __inner_canvas = __item_region;
+
+                arm_2d_layout(__inner_canvas) {
+
+                    __item_line_dock_vertical(10) {
+                        arm_2d_fill_colour(ptTile, &__item_region, GLCD_COLOR_DARK_GREY);
+
+
+                        arm_lcd_text_set_colour(GLCD_COLOR_GREEN, GLCD_COLOR_WHITE);
+                        arm_lcd_print_banner("Algorithm 1", __item_region);
+                    }
+
+                    __item_line_dock_vertical(DEMO_IMAGE.tRegion.tSize.iHeight) {
+
+                        arm_2d_tile_copy_only(  &DEMO_IMAGE,
+                                                ptTile,
+                                                &__item_region);
+
+                    }
+                }
+            }
+
+
+            /* cell 3, algorithm 2 */
+            __item_horizontal(tCell, 2,2,2,2) {
+                
+                arm_2d_region_t __inner_canvas = __item_region;
+
+                arm_2d_layout(__inner_canvas) {
+
+                    __item_line_dock_vertical(10) {
+                        arm_2d_fill_colour(ptTile, &__item_region, GLCD_COLOR_DARK_GREY);
+
+
+                        arm_lcd_text_set_colour(GLCD_COLOR_GREEN, GLCD_COLOR_WHITE);
+                        arm_lcd_print_banner("Algorithm 2", __item_region);
+                    }
+
+                    __item_line_dock_vertical(DEMO_IMAGE.tRegion.tSize.iHeight) {
+
+                        arm_2d_tile_copy_only(  &DEMO_IMAGE,
+                                                ptTile,
+                                                &__item_region);
+
+                    }
+                }
+            }
+
+            /* cell 3, algorithm 3 */
+            __item_horizontal(tCell, 2,2,2,2) {
+                
+                arm_2d_region_t __inner_canvas = __item_region;
+
+                arm_2d_layout(__inner_canvas) {
+
+                    __item_line_dock_vertical(10) {
+                        arm_2d_fill_colour(ptTile, &__item_region, GLCD_COLOR_DARK_GREY);
+
+
+                        arm_lcd_text_set_colour(GLCD_COLOR_GREEN, GLCD_COLOR_WHITE);
+                        arm_lcd_print_banner("Algorithm 3", __item_region);
+                    }
+
+                    __item_line_dock_vertical(DEMO_IMAGE.tRegion.tSize.iHeight) {
+
+                        arm_2d_tile_copy_only(  &DEMO_IMAGE,
+                                                ptTile,
+                                                &__item_region);
+
+                    }
+                }
+            }
+
+        }
 
     /*-----------------------draw the foreground end  -----------------------*/
     }
