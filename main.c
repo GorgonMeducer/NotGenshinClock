@@ -26,13 +26,6 @@
 #   include "arm_2d_benchmark.h"
 #endif
 
-#include "arm_2d_scene_meter.h"
-#include "arm_2d_scene_watch.h"
-#include "arm_2d_scene_fitness.h"
-#include "demos/arm_2d_scene_audiomark.h"
-
-#include "genshin_clock/arm_2d_scene_genshin_clock.h"
-
 #if defined(__clang__)
 #   pragma clang diagnostic push
 #   pragma clang diagnostic ignored "-Wunknown-warning-option"
@@ -62,130 +55,6 @@
 /*============================ LOCAL VARIABLES ===============================*/
 /*============================ IMPLEMENTATION ================================*/
 
-
-void scene_meter_loader(void) 
-{
-    arm_2d_scene_player_set_switching_mode( &DISP0_ADAPTER,
-                                            ARM_2D_SCENE_SWITCH_MODE_SLIDE_RIGHT);
-    arm_2d_scene_player_set_switching_period(&DISP0_ADAPTER, 500);
-    arm_2d_scene_meter_init(&DISP0_ADAPTER);
-}
-
-void scene_watch_loader(void) 
-{
-    arm_2d_scene_watch_init(&DISP0_ADAPTER);
-}
-
-void scene_fitness_loader(void) 
-{
-    arm_2d_scene_player_set_switching_mode( &DISP0_ADAPTER,
-                                            ARM_2D_SCENE_SWITCH_MODE_SLIDE_LEFT);
-    arm_2d_scene_player_set_switching_period(&DISP0_ADAPTER, 500);
-    arm_2d_scene_fitness_init(&DISP0_ADAPTER);
-}
-
-void scene_audiomark_loader(void) 
-{
-    arm_2d_scene_player_set_switching_mode( &DISP0_ADAPTER,
-                                            ARM_2D_SCENE_SWITCH_MODE_ERASE_RIGHT);
-    arm_2d_scene_player_set_switching_period(&DISP0_ADAPTER, 2000);
-
-    extern
-    IMPL_PFB_ON_DRAW(__disp_adapter0_draw_navigation);
-
-    /* register event handler for evtOnDrawNavigation */
-    arm_2d_scene_player_register_on_draw_navigation_event_handler(
-                    &DISP0_ADAPTER,
-                    __disp_adapter0_draw_navigation,
-                    NULL);
-
-    arm_2d_scene_audiomark_init(&DISP0_ADAPTER);
-}
-
-void scene0_loader(void) 
-{
-    arm_2d_scene_player_set_switching_mode( &DISP0_ADAPTER,
-                                            ARM_2D_SCENE_SWITCH_MODE_FADE_WHITE);
-    arm_2d_scene_player_set_switching_period(&DISP0_ADAPTER, 3000);
-    
-extern void disp_adapter0_navigator_init(void);
-    disp_adapter0_navigator_init();
-
-    arm_2d_scene0_init(&DISP0_ADAPTER);
-}
-
-void scene1_loader(void) 
-{
-    arm_2d_scene1_init(&DISP0_ADAPTER);
-}
-
-void scene2_loader(void) 
-{
-    arm_2d_scene_player_set_switching_mode( &DISP0_ADAPTER,
-                                            ARM_2D_SCENE_SWITCH_MODE_SLIDE_UP);
-    arm_2d_scene_player_set_switching_period(&DISP0_ADAPTER, 4000);
-    arm_2d_scene2_init(&DISP0_ADAPTER);
-}
-
-void scene3_loader(void) 
-{
-    arm_2d_scene3_init(&DISP0_ADAPTER);
-}
-
-void scene4_loader(void) 
-{
-    arm_2d_scene_player_set_switching_mode( &DISP0_ADAPTER,
-                                            ARM_2D_SCENE_SWITCH_MODE_SLIDE_RIGHT);
-    arm_2d_scene_player_set_switching_period(&DISP0_ADAPTER, 500);
-    arm_2d_scene4_init(&DISP0_ADAPTER);
-}
-
-void scene5_loader(void) 
-{
-    arm_2d_scene_player_set_switching_mode( &DISP0_ADAPTER,
-                                            ARM_2D_SCENE_SWITCH_MODE_FADE_BLACK);
-    arm_2d_scene_player_set_switching_period(&DISP0_ADAPTER, 3000);
-    arm_2d_scene5_init(&DISP0_ADAPTER);
-}
-
-void scene_clock_loader(void)
-{
-    arm_2d_scene_genshin_clock_init(&DISP0_ADAPTER);
-}
-
-typedef void scene_loader_t(void);
-
-static scene_loader_t * const c_SceneLoaders[] = {
-#if 1
-    scene0_loader,
-    scene1_loader,
-    scene_meter_loader,
-    //scene3_loader,
-    scene5_loader,
-    scene4_loader,
-    //scene2_loader,
-    scene_fitness_loader,
-#endif
-    scene_audiomark_loader,
-};
-
-
-/* load scene one by one */
-void before_scene_switching_handler(void *pTarget,
-                                    arm_2d_scene_player_t *ptPlayer,
-                                    arm_2d_scene_t *ptScene)
-{
-    static uint_fast8_t s_chIndex = 0;
-
-    if (s_chIndex >= dimof(c_SceneLoaders)) {
-        s_chIndex = 0;
-    }
-    
-    /* call loader */
-    c_SceneLoaders[s_chIndex]();
-    s_chIndex++;
-}
-
 /*----------------------------------------------------------------------------
   Main function
  *----------------------------------------------------------------------------*/
@@ -195,10 +64,7 @@ int app_2d_main_thread (void *argument)
 #ifdef RTE_Acceleration_Arm_2D_Extra_Benchmark
     arm_2d_run_benchmark();
 #else
-
-    arm_2d_scene_player_register_before_switching_event_handler(
-            &DISP0_ADAPTER,
-            before_scene_switching_handler);
+    arm_2d_scene0_init(&DISP0_ADAPTER);
     
     arm_2d_scene_player_switch_to_next_scene(&DISP0_ADAPTER);
 #endif

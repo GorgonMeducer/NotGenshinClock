@@ -64,7 +64,7 @@ extern "C" {
 // <i> The height of your screen
 // <i> Default: 240
 #ifndef __DISP0_CFG_SCEEN_HEIGHT__
-#   define __DISP0_CFG_SCEEN_HEIGHT__                              854
+#   define __DISP0_CFG_SCEEN_HEIGHT__                              480
 #endif
 
 /*

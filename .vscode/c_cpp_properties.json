@@ -7,8 +7,6 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/sdl2/32/include",
-                "${workspaceFolder}/genshin_clock",
-                "${workspaceFolder}/genshin_clock/resources",
                 "${workspaceFolder}/platform",
                 "${workspaceFolder}/platform/math",
                 "${workspaceFolder}/platform/math/dsp",
@@ -37,8 +35,6 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/sdl2/32/include",
-                "${workspaceFolder}/genshin_clock",
-                "${workspaceFolder}/genshin_clock/resources",
                 "${workspaceFolder}/platform",
                 "${workspaceFolder}/platform/math",
                 "${workspaceFolder}/platform/math/dsp",
