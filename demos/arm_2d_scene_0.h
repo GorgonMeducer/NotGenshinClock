@@ -26,6 +26,7 @@
 #ifdef RTE_Acceleration_Arm_2D_Scene0
 
 #include "arm_2d_helper_scene.h"
+#include "arm_2d_user_opcode_template.h"
 
 #ifdef   __cplusplus
 extern "C" {
@@ -81,6 +82,8 @@ ARM_PRIVATE(
     /* place your private member here, following two are examples */
     int64_t lTimestamp[1];
     bool bUserAllocated;
+
+    arm_2d_user_opcode_template_descriptor_t tUserOPCODETemplate;
 
 )
     /* place your public member here */

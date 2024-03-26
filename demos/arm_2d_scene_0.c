@@ -28,6 +28,8 @@
 #include "arm_2d_helper.h"
 #include "arm_2d_example_controls.h"
 
+#include "arm_2d_user_opcode_template.h"
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -86,7 +88,7 @@
 #   error Unsupported colour depth!
 #endif
 
-#define DEMO_IMAGE              c_tileBuff      //c_tileLenna
+#define DEMO_IMAGE                    c_tileLenna //c_tileBuff
 
 /*============================ MACROFIED FUNCTIONS ===========================*/
 #undef this
@@ -121,6 +123,8 @@ static void __on_scene0_depose(arm_2d_scene_t *ptScene)
     arm_foreach(int64_t,this.lTimestamp, ptItem) {
         *ptItem = 0;
     }
+
+    ARM_2D_OP_DEPOSE(this.tUserOPCODETemplate);
 
     if (!this.bUserAllocated) {
         __arm_2d_free_scratch_memory(ARM_2D_MEM_TYPE_UNSPECIFIED, ptScene);
@@ -237,9 +241,15 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
 
                     __item_line_dock_vertical(DEMO_IMAGE.tRegion.tSize.iHeight) {
 
-                        arm_2d_tile_copy_only(  &DEMO_IMAGE,
-                                                ptTile,
-                                                &__item_region);
+                        arm_2d_user_opcode_template_api_params_t tParams = {
+                            .chChannel = 0,
+                        };
+
+                        arm_2dp_cccn888_user_opcode_template(   &this.tUserOPCODETemplate,
+                                                                &DEMO_IMAGE,
+                                                                ptTile,
+                                                                &__item_region,
+                                                                &tParams);
 
                     }
                 }
@@ -263,9 +273,15 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
 
                     __item_line_dock_vertical(DEMO_IMAGE.tRegion.tSize.iHeight) {
 
-                        arm_2d_tile_copy_only(  &DEMO_IMAGE,
-                                                ptTile,
-                                                &__item_region);
+                        arm_2d_user_opcode_template_api_params_t tParams = {
+                            .chChannel = 1,
+                        };
+
+                        arm_2dp_cccn888_user_opcode_template(   &this.tUserOPCODETemplate,
+                                                                &DEMO_IMAGE,
+                                                                ptTile,
+                                                                &__item_region,
+                                                                &tParams);
 
                     }
                 }
@@ -288,9 +304,15 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
 
                     __item_line_dock_vertical(DEMO_IMAGE.tRegion.tSize.iHeight) {
 
-                        arm_2d_tile_copy_only(  &DEMO_IMAGE,
-                                                ptTile,
-                                                &__item_region);
+                        arm_2d_user_opcode_template_api_params_t tParams = {
+                            .chChannel = 2,
+                        };
+
+                        arm_2dp_cccn888_user_opcode_template(   &this.tUserOPCODETemplate,
+                                                                &DEMO_IMAGE,
+                                                                ptTile,
+                                                                &__item_region,
+                                                                &tParams);
 
                     }
                 }
@@ -385,6 +407,7 @@ user_scene_0_t *__arm_2d_scene0_init(   arm_2d_scene_player_t *ptDispAdapter,
         .bUserAllocated = bUserAllocated,
     };
     
+    ARM_2D_OP_INIT(this.tUserOPCODETemplate);
 
     arm_2d_scene_player_append_scenes(  ptDispAdapter, 
                                         &this.use_as__arm_2d_scene_t, 
