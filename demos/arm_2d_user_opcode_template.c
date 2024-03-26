@@ -188,7 +188,7 @@ def_low_lv_io(  __ARM_2D_IO_USER_OPCODE_TEMPLATE_CCCN888,
 
 
 /*
- * OPCODE Descriptor
+ * OPCODE
  */
 const __arm_2d_op_info_t ARM_2D_OP_USER_OPCODE_TEMPLATE = {
     .Info = {
