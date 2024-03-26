@@ -82,9 +82,6 @@ void __arm_2d_impl_cccn888_user_opcode_template(
                             arm_2d_user_opcode_template_api_params_t *ptParam);
 
 /*============================ LOCAL VARIABLES ===============================*/
-
-static long dbgc;
-
 /*============================ IMPLEMENTATION ================================*/
 
 /*
@@ -145,12 +142,8 @@ arm_fsm_rt_t __arm_2d_cccn888_sw_user_opcode_template( __arm_2d_sub_task_t *ptTa
 
 #define PFB_BLUR 0
 
-#if PFB_BLUR
-void blur_filter (uint32_t * data, short iWidth, short iHeight, short iTargetStride, char c, 
-                uint32_t *left, uint32_t *top, uint32_t *right, uint32_t *bottom)
-#else                
-void blur_filter (uint32_t * data, short iWidth, short iHeight, short iTargetStride, char c)
-#endif            
+               
+void blur_filter (uint32_t * data, short iWidth, short iHeight, short iTargetStride, char c)           
 {
     short iY, iX, k;
     unsigned short accuR, accuG, accuB;
@@ -160,11 +153,9 @@ void blur_filter (uint32_t * data, short iWidth, short iHeight, short iTargetStr
     /* rows direct path */
     for (iY = 0; iY < iHeight; iY++)
     {   
-      #if PFB
-        pt32 = &(left[iY]);
-      #else        
+      
         pt32 = &(data[iY*iTargetStride]);
-      #endif        
+       
         pt8 = (unsigned char *)pt32;     /* read RGBA 8888  */
         accuR = *pt8++;
         accuG = *pt8++;
@@ -179,10 +170,7 @@ void blur_filter (uint32_t * data, short iWidth, short iHeight, short iTargetStr
             accuB += ((*pt8) - accuB) >> c;  *pt8++ = accuB;
             pt8++;                  /* skip A */
         }
-
-      #if PFB   /* save the state of the row filter */
-        right[iY] = (0xFF & accuR) | ((0xFF & accuG)<<8) | ((0xFF & accuB)<<16);
-      #endif            
+          
     }
 
 #if 1
@@ -212,11 +200,7 @@ void blur_filter (uint32_t * data, short iWidth, short iHeight, short iTargetStr
     /* columns direct path */
     for (iX = 0; iX < iWidth; iX++)
     {   
-      #if PFB
-        pt32 = &(top[iX]);
-      #else        
-        pt32 = &(data[iX]);
-      #endif        
+        pt32 = &(data[iX]);      
 
         pt8 = (char *)pt32;     /* read RGBA 8888  */
         accuR = *pt8++;
@@ -233,12 +217,10 @@ void blur_filter (uint32_t * data, short iWidth, short iHeight, short iTargetStr
             pt8++; 
             pt8 = pt8 - 4 + (iTargetStride*4);
         }
-      #if PFB   /* save the state of the column filter */
-        bottom[iX] = (0xFF & accuR) | ((0xFF & accuG)<<8) | ((0xFF & accuB)<<16);
-      #endif            
+          
     }
 #endif
-#if 1    
+#if 1
     /* columns reverse path */
     for (iX = iWidth-1; iX > 0; iX--)
     {   
@@ -278,12 +260,8 @@ void __arm_2d_impl_cccn888_user_opcode_template(
     uint_fast8_t chTargetChannel = ptParam->chChannel;
     uint_fast8_t sigma = ptParam->sigma;
 
-
-#if PFB 
+  
     blur_filter (pwTarget, iWidth, iHeight, iTargetStride, sigma);
-#else    
-    blur_filter (pwTarget, iWidth, iHeight, iTargetStride, sigma);
-#endif
 
 
 #if 0
