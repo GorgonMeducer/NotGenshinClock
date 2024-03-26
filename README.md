@@ -13,7 +13,7 @@ This example project currently support Windows, Linux and MacOS. Please follow t
 First, please clone the project to your local machine. You can do this by running the following command in your terminal:
 
 ```bash
-git clone -b Demo-for-Events-2023 --recursive https://github.com/GorgonMeducer/NotGenshinClock.git
+git clone -b IIR-Blur --recursive https://github.com/GorgonMeducer/NotGenshinClock.git
 ```
 
 The `--recursive` option is used to clone all the submodules included in the project.
