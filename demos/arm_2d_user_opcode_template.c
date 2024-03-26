@@ -183,8 +183,7 @@ void __arm_2d_impl_cccn888_user_opcode_template(
  */
 __WEAK
 def_low_lv_io(  __ARM_2D_IO_USER_OPCODE_TEMPLATE_CCCN888,
-                __arm_2d_cccn888_sw_user_opcode_template,       /* Default SW Implementation */
-                NULL);                                          /* NULL: HW Acceleration Entry*/
+                __arm_2d_cccn888_sw_user_opcode_template);      /* Default SW Implementation */
 
 
 /*
