@@ -243,6 +243,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
 
                         arm_2d_user_opcode_template_api_params_t tParams = {
                             .chChannel = 0,
+                            .sigma = 2,
                         };
 
                         arm_2dp_cccn888_user_opcode_template(   &this.tUserOPCODETemplate,
@@ -275,6 +276,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
 
                         arm_2d_user_opcode_template_api_params_t tParams = {
                             .chChannel = 1,
+                            .sigma = 3,
                         };
 
                         arm_2dp_cccn888_user_opcode_template(   &this.tUserOPCODETemplate,
@@ -306,6 +308,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene0_handler)
 
                         arm_2d_user_opcode_template_api_params_t tParams = {
                             .chChannel = 2,
+                            .sigma = 4,
                         };
 
                         arm_2dp_cccn888_user_opcode_template(   &this.tUserOPCODETemplate,
