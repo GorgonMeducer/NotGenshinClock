@@ -9,37 +9,61 @@
 
 #undef main
 
-#define monochrome_2_RGB888(color)                (color?0x000000:0xffffff)
+#define monochrome_2_RGB888(color)                (color < 128 ?0x000000:0xffffff)
 #define GRAY8_2_RGB888(color)                     (((color&0xFF)<<16)+((color&0xFF)<<8)+((color&0xFF)))
 #define RGB565_2_RGB888(color)                    (((color&0xF800)<<8)+((color&0x7E0)<<5)+((color&0x1F)<<3))
 
 
-#define RGB888_2_monochrome(color)                ((color)?0:1)
+
 #define RGB888_2_GRAY8(color)                     (((((color&0xff0000)>>16)) + (((color&0xff00)>>8)) + (((color&0xff)))) / 3)
 #define RGB888_2_RGB565(color)                    ((((color&0xff0000)>>19) << 11) + (((color&0xff00)>>10) << 5) + (((color&0xff)>>3)))
-
+#define RGB888_2_monochrome(color)                ((RGB888_2_GRAY8(color) < 128 )?0:1)
 
 // 1 8(233) 16(565) 24(888) 32(8888)
 #if VT_COLOR_DEPTH == 1
 #define DEV_2_VT_RGB(color)                  monochrome_2_RGB888(color)
 #define VT_RGB_2_DEV(color)                  RGB888_2_monochrome(color)
+
+static uint8_t s_tFramebuffer[3][VT_WIDTH * VT_HEIGHT];
+
 #elif VT_COLOR_DEPTH == 8
 #define DEV_2_VT_RGB(color)                  GRAY8_2_RGB888(color)
 #define VT_RGB_2_DEV(color)                  RGB888_2_GRAY8(color)
+
+static uint8_t s_tFramebuffer[3][VT_WIDTH * VT_HEIGHT];
+
 #elif VT_COLOR_DEPTH == 16
 #define DEV_2_VT_RGB(color)                  RGB565_2_RGB888(color)
 #define VT_RGB_2_DEV(color)                  RGB888_2_RGB565(color)
+
+static uint16_t s_tFramebuffer[3][VT_WIDTH * VT_HEIGHT];
+
 #elif VT_COLOR_DEPTH == 24 || VT_COLOR_DEPTH == 32
 #define DEV_2_VT_RGB(color)                 (color)
 #define VT_RGB_2_DEV(color)                 (color)
+
+static uint32_t s_tFramebuffer[3][VT_WIDTH * VT_HEIGHT];
+
+#endif
+
+#if VT_WIDTH >= 240 || VT_HEIGHT >= 240
+#   define VT_WINDOW_WIDTH     VT_WIDTH
+#   define VT_WINDOW_HEIGHT    VT_HEIGHT
+#else
+#   define VT_WINDOW_WIDTH      (VT_WIDTH * 2)
+#   define VT_WINDOW_HEIGHT     (VT_HEIGHT * 2)
 #endif
 
 static SDL_Window * window;
 static SDL_Renderer * renderer;
 static SDL_Texture * texture;
 static uint32_t tft_fb[VT_WIDTH * VT_HEIGHT];
+
+uintptr_t __DISP_ADAPTER0_3FB_FB0_ADDRESS__;
+uintptr_t __DISP_ADAPTER0_3FB_FB1_ADDRESS__;
+uintptr_t __DISP_ADAPTER0_3FB_FB2_ADDRESS__;
+
 static volatile bool sdl_inited = false;
-static volatile bool sdl_refr_qry = false;
 static volatile bool sdl_refr_cpl = false;
 static volatile bool sdl_quit_qry = false;
 
@@ -56,22 +80,12 @@ extern void VT_Clear(color_typedef color);
 extern bool VT_Mouse_Get_Point(int16_t *x,int16_t *y);
 
 
-/*******************************************************************************
- * @name     :VT_Mouse_Get_Point
- * @brief    :get mouse click position
- * @param    :x       pointer,save click position x
- *            y       pointer,save click position y
- * @return   :true    press
- *            false   relase
- * @version  :V0.1
- * @author   :
- * @date     :2018.11.20
- * @details  :
-*******************************************************************************/
-bool VT_mouse_get_point(int16_t *x,int16_t *y)
+
+bool VT_mouse_get_location(arm_2d_location_t *ptLocation)
 {
-    *x=last_x;
-    *y=last_y;
+    assert(NULL != ptLocation);
+    ptLocation->iX = last_x;
+    ptLocation->iY = last_y;
     return left_button_is_down;
 }
 
@@ -86,8 +100,70 @@ int quit_filter(void * userdata, SDL_Event * event)
     return 1;
 }
 
+typedef struct RecursiveMutex {
+    SDL_mutex *mutex;
+    SDL_threadID owner;
+    int lock_count;
+} RecursiveMutex;
+
+RecursiveMutex* RecursiveMutex_Create(void) {
+    RecursiveMutex* rmutex = (RecursiveMutex*)malloc(sizeof(RecursiveMutex));
+    rmutex->mutex = SDL_CreateMutex();
+    rmutex->owner = 0;
+    rmutex->lock_count = 0;
+    return rmutex;
+}
+
+void RecursiveMutex_Lock(RecursiveMutex* rmutex) {
+    assert(NULL != rmutex);
+
+    SDL_threadID tid = SDL_ThreadID();
+    if (rmutex->owner == tid) {
+        // 如果是同一线程，增加锁计数
+        rmutex->lock_count++;
+    } else {
+        // 不同线程则锁定
+        SDL_LockMutex(rmutex->mutex);
+        rmutex->owner = tid;
+        rmutex->lock_count = 1;
+    }
+}
+
+void RecursiveMutex_Unlock(RecursiveMutex* rmutex) {
+    assert(NULL != rmutex);
+    if (rmutex->owner == SDL_ThreadID()) {
+        rmutex->lock_count--;
+        if (rmutex->lock_count == 0) {
+            rmutex->owner = 0;
+            SDL_UnlockMutex(rmutex->mutex);
+        }
+    }
+}
+
+void RecursiveMutex_Destroy(RecursiveMutex* rmutex) {
+    assert(NULL != rmutex);
+    SDL_DestroyMutex(rmutex->mutex);
+    free(rmutex);
+}
+
+static 
+RecursiveMutex *s_ptGlobalMutex = NULL;
+
+void VT_enter_global_mutex(void)
+{
+    RecursiveMutex_Lock(s_ptGlobalMutex);
+}
+
+void VT_leave_global_mutex(void)
+{
+    RecursiveMutex_Unlock(s_ptGlobalMutex);
+}
+
+
 static void monitor_sdl_clean_up(void)
 {
+    RecursiveMutex_Destroy(s_ptGlobalMutex);
+
     SDL_DestroyTexture(texture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
@@ -96,32 +172,31 @@ static void monitor_sdl_clean_up(void)
 
 static void monitor_sdl_init(void)
 {
+#if __DISP0_CFG_ENABLE_3FB_HELPER_SERVICE__
+    __DISP_ADAPTER0_3FB_FB0_ADDRESS__ = (uintptr_t)s_tFramebuffer[0];
+    __DISP_ADAPTER0_3FB_FB1_ADDRESS__ = (uintptr_t)s_tFramebuffer[1];
+    __DISP_ADAPTER0_3FB_FB2_ADDRESS__ = (uintptr_t)s_tFramebuffer[2];
+#endif
 
     /*Initialize the SDL*/
     SDL_Init(SDL_INIT_VIDEO);
 
+    s_ptGlobalMutex = RecursiveMutex_Create();
+
     SDL_SetEventFilter(quit_filter, NULL);
 
-    window = SDL_CreateWindow(  
-                                "NotGenshin Clock(v0.8.0)"
-                                "                                               - Created with Arm-2D v" 
-                                ARM_TO_STRING(ARM_2D_VERSION_MAJOR)
-                                "."
-                                ARM_TO_STRING(ARM_2D_VERSION_MINOR)
-                                "."
-                                ARM_TO_STRING(ARM_2D_VERSION_PATCH)
-                                "-"
-                                ARM_2D_VERSION_STR
+    window = SDL_CreateWindow( "NotGenshinClock v1.0.0"
                                 " ("
-                                ARM_TO_STRING(VT_WIDTH)
+                                ARM_TO_STRING(__DISP0_CFG_SCEEN_WIDTH__)
                                 "*"
-                                ARM_TO_STRING(VT_HEIGHT)
+                                ARM_TO_STRING(__DISP0_CFG_SCEEN_HEIGHT__)
                                 " "
                                 ARM_TO_STRING(VT_COLOR_DEPTH)
                                 "bits )"
                                 ,
-                                SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                                VT_WIDTH, VT_HEIGHT, 0);       /*last param. SDL_WINDOW_BORDERLESS to hide borders*/
+                                SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+                                VT_WINDOW_WIDTH, VT_WINDOW_HEIGHT, 
+                                SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);       /*last param. SDL_WINDOW_BORDERLESS to hide borders*/
 
 #if VT_VIRTUAL_MACHINE
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
@@ -132,28 +207,42 @@ static void monitor_sdl_init(void)
                                 SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, VT_WIDTH, VT_HEIGHT);
     SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
 
+    SDL_RenderSetLogicalSize(renderer, __DISP0_CFG_SCEEN_WIDTH__, __DISP0_CFG_SCEEN_HEIGHT__);
+
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+
     /*Initialize the frame buffer to gray (77 is an empirical value) */
     memset(tft_fb, 77, VT_WIDTH * VT_HEIGHT * sizeof(uint32_t));
     SDL_UpdateTexture(texture, NULL, tft_fb, VT_WIDTH * sizeof(uint32_t));
-    sdl_refr_qry = true;
     sdl_inited = true;
 }
 
 void VT_sdl_refresh_task(void)
 {
-    if(sdl_refr_qry != false)
-    {
-        if (arm_2d_helper_is_time_out(1000/60)) 
-        {
-            sdl_refr_qry = false;
-            SDL_UpdateTexture(texture, NULL, tft_fb, VT_WIDTH * sizeof(uint32_t));
-            SDL_RenderClear(renderer);
+    if (arm_2d_helper_is_time_out(1000/60)) {
 
-            /*Update the renderer with the texture containing the rendered image*/
-            SDL_RenderCopy(renderer, texture, NULL, NULL);
-            SDL_RenderPresent(renderer);
+    #if __DISP0_CFG_ENABLE_3FB_HELPER_SERVICE__
+        void * pFrameBuffer = disp_adapter0_3fb_get_flush_pointer();
+        static void *s_pLastFB = NULL;
+    
+        VT_Fill_Multiple_Colors(0, 0, VT_WIDTH - 1, VT_HEIGHT - 1, (color_typedef *)pFrameBuffer);
+
+        /* ensure the new content has been displayed*/
+        if (pFrameBuffer != s_pLastFB) {
             sdl_refr_cpl = true;
         }
+        s_pLastFB = pFrameBuffer;
+    #else
+        sdl_refr_cpl = true;
+    #endif
+
+
+        SDL_UpdateTexture(texture, NULL, tft_fb, VT_WIDTH * sizeof(uint32_t));
+        SDL_RenderClear(renderer);
+
+        /*Update the renderer with the texture containing the rendered image*/
+        SDL_RenderCopy(renderer, texture, NULL, NULL);
+        SDL_RenderPresent(renderer);
     }
 
     SDL_Event event;
@@ -220,14 +309,23 @@ int32_t Disp0_DrawBitmap(int16_t x,int16_t y,int16_t width,int16_t height,const 
     return 0;
 }
 
-void VT_sdl_flush(int32_t nMS)
+bool VT_sdl_flush(int32_t nMS)
 {
-    nMS = MAX(1, nMS);
-    while(!sdl_refr_cpl) {
+    bool bResult = false;
+    
+    arm_irq_safe {
+        if (sdl_refr_cpl) {
+            sdl_refr_cpl = false;
+            bResult = true;
+        }
+    }
+
+    if (!bResult) {
+        nMS = MAX(1, nMS);
         SDL_Delay(nMS);
     }
-    sdl_refr_cpl = false;
-    sdl_refr_qry = true;
+
+    return bResult;
 }
 
 #if defined(_POSIX_VERSION) || defined(CLOCK_MONOTONIC) || defined(__APPLE__)

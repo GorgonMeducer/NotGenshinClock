@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2022 Arm Limited. All rights reserved.
+ * Copyright (c) 2009-2024 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -18,17 +18,12 @@
 
 /*============================ INCLUDES ======================================*/
 
-
-#include "arm_2d.h"
+#include "arm_2d_disp_adapter_0.h"
 
 #ifdef RTE_Acceleration_Arm_2D_Helper_Disp_Adapter0
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "arm_2d_helper.h"
-#include "arm_extra_lcd_printf.h"
-#include "arm_extra_controls.h"
-#include "arm_2d_disp_adapter_0.h"
 
 #if defined(__clang__)
 #   pragma clang diagnostic push
@@ -72,6 +67,26 @@
 #   endif
 #endif
 
+#if __DISP0_CFG_USE_CONSOLE__
+
+#ifndef __DISP0_CONSOLE_WIDTH__
+#   if __DISP0_CFG_SCEEN_WIDTH__ < 204
+#       define __DISP0_CONSOLE_WIDTH__      __DISP0_CFG_SCEEN_WIDTH__
+#   else
+#       define __DISP0_CONSOLE_WIDTH__      204
+#   endif
+#endif
+
+#ifndef __DISP0_CONSOLE_HEIGHT__
+#   if __DISP0_CFG_SCEEN_HEIGHT__ < 200
+#       define __DISP0_CONSOLE_HEIGHT__      __DISP0_CFG_SCEEN_HEIGHT__
+#   else
+#       define __DISP0_CONSOLE_HEIGHT__      192
+#   endif
+#endif
+
+#endif
+
 /*============================ MACROFIED FUNCTIONS ===========================*/
 /*============================ TYPES =========================================*/
 /*============================ GLOBAL VARIABLES ==============================*/
@@ -87,6 +102,21 @@ int32_t Disp0_DrawBitmap(int16_t x,
 
 /*============================ LOCAL VARIABLES ===============================*/
 
+#if __DISP0_CFG_NAVIGATION_LAYER_MODE__ == 2
+/* the round mode */
+IMPL_ARM_2D_REGION_LIST(s_tNavDirtyRegionList, static)
+
+    /* a region for the status bar on the bottom of the screen */
+    ADD_LAST_REGION_TO_LIST(s_tNavDirtyRegionList,
+        .tSize = {
+            .iWidth = 100,
+            .iHeight = 24,
+        },
+    ),
+
+END_IMPL_ARM_2D_REGION_LIST(s_tNavDirtyRegionList)
+#endif
+
 ARM_NOINIT 
 arm_2d_scene_player_t DISP0_ADAPTER;
 
@@ -96,9 +126,19 @@ static
 arm_2d_helper_3fb_t s_tDirectModeHelper;
 #endif
 
+#if __DISP0_CFG_USE_CONSOLE__
+static 
+struct {
+    console_box_t tConsole;
+    int64_t lTimestamp;
+    arm_2d_region_list_item_t tBackground;
+    uint32_t Signature;
+    bool bShowConsole;
+    uint8_t chOpacity;
+} DISP0_CONSOLE;
+#endif
 
 /*============================ IMPLEMENTATION ================================*/
-
 static void __on_frame_start(arm_2d_scene_t *ptScene)
 {
     ARM_2D_UNUSED(ptScene);
@@ -113,13 +153,11 @@ static void __on_frame_complete(arm_2d_scene_t *ptScene)
 static
 IMPL_PFB_ON_DRAW(__pfb_draw_handler)
 {
-    ARM_2D_UNUSED(pTarget);
-    ARM_2D_UNUSED(ptTile);
+    ARM_2D_PARAM(pTarget);
+    ARM_2D_PARAM(ptTile);
 
     arm_2d_canvas(ptTile, __top_container) {
-    
-        arm_2d_fill_colour(ptTile, NULL, GLCD_COLOR_WHITE);
-        
+    #if __DISP0_CFG_COLOR_SOLUTION__ != 1
         arm_2d_align_centre(__top_container, 100, 100) {
             draw_round_corner_box(  ptTile,
                                     &__centre_region,
@@ -127,6 +165,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_handler)
                                     64,
                                     bIsNewFrame);
         }
+    #endif
 
         busy_wheel2_show(ptTile, bIsNewFrame);
     }
@@ -136,13 +175,122 @@ IMPL_PFB_ON_DRAW(__pfb_draw_handler)
     return arm_fsm_rt_cpl;
 }
 
-#if !__DISP0_CFG_DISABLE_NAVIGATION_LAYER__
+#if __DISP0_CFG_NAVIGATION_LAYER_MODE__
+
+__WEAK 
+IMPL_PFB_ON_DRAW(__disp_adapter0_user_draw_navigation)
+{
+    ARM_2D_PARAM(ptTile);
+    ARM_2D_PARAM(pTarget);
+    ARM_2D_PARAM(bIsNewFrame);
+
+    return arm_fsm_rt_cpl;
+}
+
 __WEAK
 IMPL_PFB_ON_DRAW(__disp_adapter0_draw_navigation)
 {
-    ARM_2D_UNUSED(pTarget);
-    ARM_2D_UNUSED(bIsNewFrame);
+    ARM_2D_PARAM(pTarget);
+    ARM_2D_PARAM(bIsNewFrame);
 
+    while(  arm_fsm_rt_cpl != 
+            __disp_adapter0_user_draw_navigation(  pTarget, 
+                                                            ptTile, 
+                                                            bIsNewFrame));
+
+#if __DISP0_CFG_USE_CONSOLE__
+
+    if (bIsNewFrame) {
+        if (console_box_on_frame_start(&DISP0_CONSOLE.tConsole)) {
+            DISP0_CONSOLE.lTimestamp = 0;
+            if (!DISP0_CONSOLE.bShowConsole) {
+                arm_2d_dirty_region_item_ignore_set(&DISP0_CONSOLE.tBackground, false);
+            } else {
+                arm_2d_dirty_region_item_ignore_set(&DISP0_CONSOLE.tBackground, true);
+            }
+            DISP0_CONSOLE.bShowConsole = true;
+            DISP0_CONSOLE.chOpacity = 255;
+        }
+
+    #if __DISP0_CFG_CONSOLE_DISPALY_TIME__ >= 1000                              \
+    && __DISP0_CFG_CONSOLE_DISPALY_TIME__ != 0xFFFFFFFF
+        if (DISP0_CONSOLE.bShowConsole) {
+            if (arm_2d_helper_is_time_out(__DISP0_CFG_CONSOLE_DISPALY_TIME__, &DISP0_CONSOLE.lTimestamp)) {
+                DISP0_CONSOLE.bShowConsole = false;
+            } else {
+                int64_t lTimeElapsedInMs = -arm_2d_helper_time_elapsed(&DISP0_CONSOLE.lTimestamp);
+                if (lTimeElapsedInMs > 255) {
+                    DISP0_CONSOLE.chOpacity = 255;
+                } else {
+                    DISP0_CONSOLE.chOpacity = lTimeElapsedInMs;
+                }
+            }
+        }
+    #endif
+    }
+
+    arm_2d_canvas(ptTile, __navigation_canvas) {
+
+        if (DISP0_CONSOLE.bShowConsole) {
+            arm_2d_align_top_left(  __navigation_canvas, 
+                                    __DISP0_CONSOLE_WIDTH__ + 8, 
+                                    __DISP0_CONSOLE_HEIGHT__ + 8) {
+
+                draw_round_corner_box(  ptTile, 
+                                        &__top_left_region, 
+                                        GLCD_COLOR_DARK_GREY, 
+                                        (128 * DISP0_CONSOLE.chOpacity) >> 8,
+                                        bIsNewFrame);
+
+                console_box_show(&DISP0_CONSOLE.tConsole,
+                                ptTile,
+                                &__top_left_region,
+                                bIsNewFrame,
+                                DISP0_CONSOLE.chOpacity);
+            }
+        }
+    }
+
+#endif
+
+#if __DISP0_CFG_NAVIGATION_LAYER_MODE__ == 2
+    /* round mode */
+    arm_lcd_text_set_target_framebuffer((arm_2d_tile_t *)ptTile);
+    arm_lcd_text_set_font(&ARM_2D_FONT_6x8.use_as__arm_2d_font_t);
+    arm_lcd_text_set_draw_region(&(s_tNavDirtyRegionList[0].tRegion));
+    
+    if (__DISP0_CFG_ITERATION_CNT__) {
+        draw_round_corner_box(  ptTile, 
+                                &(s_tNavDirtyRegionList[0].tRegion), 
+                                __RGB(64,64,64),
+                                255-32,
+                                bIsNewFrame);
+
+        ARM_2D_OP_WAIT_ASYNC();
+
+    #if __DISP0_CFG_COLOUR_DEPTH__ == 8
+        arm_lcd_text_set_colour(GLCD_COLOR_LIGHT_GREY, GLCD_COLOR_BLACK);
+    #else
+        arm_lcd_text_set_colour(GLCD_COLOR_GREEN, GLCD_COLOR_BLACK);
+    #endif
+
+        arm_lcd_text_location(0,0);
+        if (DISP0_ADAPTER.Benchmark.wAverage) {
+            arm_lcd_printf(
+                "  FPS:%3"PRIu32":%"PRIu32"ms\r\n",
+                MIN(arm_2d_helper_get_reference_clock_frequency() / DISP0_ADAPTER.Benchmark.wAverage, 999),
+                (uint32_t)arm_2d_helper_convert_ticks_to_ms(DISP0_ADAPTER.Benchmark.wAverage));
+        }
+        arm_lcd_printf( 
+            "  CPU:%2.2f%% \r\n", 
+            DISP0_ADAPTER.Benchmark.fCPUUsage);
+
+        arm_lcd_printf( 
+            "  LCD:%2"PRIu32"ms",
+            (uint32_t)arm_2d_helper_convert_ticks_to_ms(DISP0_ADAPTER.Benchmark.wLCDLatency) );
+        
+    }
+#else
     arm_lcd_text_set_target_framebuffer((arm_2d_tile_t *)ptTile);
     arm_lcd_text_set_font(&ARM_2D_FONT_6x8.use_as__arm_2d_font_t);
     arm_lcd_text_set_draw_region(NULL);
@@ -165,27 +313,33 @@ IMPL_PFB_ON_DRAW(__disp_adapter0_draw_navigation)
                     }, 
                     (__arm_2d_color_t){__RGB(64,64,64)}, 
                     255 - 32);
-        arm_2d_op_wait_async(NULL);
-        arm_lcd_text_set_colour(GLCD_COLOR_GREEN, GLCD_COLOR_WHITE);
+
+        ARM_2D_OP_WAIT_ASYNC();
+
+    #if __DISP0_CFG_COLOUR_DEPTH__ == 8
+        arm_lcd_text_set_colour(GLCD_COLOR_LIGHT_GREY, GLCD_COLOR_BLACK);
+    #else
+        arm_lcd_text_set_colour(GLCD_COLOR_GREEN, GLCD_COLOR_BLACK);
+    #endif
         arm_lcd_text_location((__DISP0_CFG_SCEEN_HEIGHT__ + 7) / 8 - 2,
                               0);
 
         if (DISP0_ADAPTER.Benchmark.wAverage) {
             arm_lcd_printf(
-                "FPS:%3d:%dms ",
+                "FPS:%3"PRIu32":%"PRIu32"ms ",
                 MIN(arm_2d_helper_get_reference_clock_frequency() / DISP0_ADAPTER.Benchmark.wAverage, 999),
-                (int32_t)arm_2d_helper_convert_ticks_to_ms(DISP0_ADAPTER.Benchmark.wAverage));
+                (uint32_t)arm_2d_helper_convert_ticks_to_ms(DISP0_ADAPTER.Benchmark.wAverage));
         }
 
 #if __DISP0_CFG_SCEEN_WIDTH__ >= 240
         arm_lcd_printf( 
-            "CPU:%2.2f%% LCD-Latency:%2dms", 
+            "CPU:%2.2f%% LCD-Latency:%2"PRIu32"ms", 
             DISP0_ADAPTER.Benchmark.fCPUUsage,
-            (int32_t)arm_2d_helper_convert_ticks_to_ms(DISP0_ADAPTER.Benchmark.wLCDLatency));
+            (uint32_t)arm_2d_helper_convert_ticks_to_ms(DISP0_ADAPTER.Benchmark.wLCDLatency));
 #else
         arm_lcd_printf( 
-            "LCD:%2dms",
-            (int32_t)arm_2d_helper_convert_ticks_to_ms(DISP0_ADAPTER.Benchmark.wLCDLatency) );
+            "LCD:%2"PRIu32"ms",
+            (uint_fast64_t)arm_2d_helper_convert_ticks_to_ms(DISP0_ADAPTER.Benchmark.wLCDLatency) );
 #endif
     }
 
@@ -201,12 +355,12 @@ IMPL_PFB_ON_DRAW(__disp_adapter0_draw_navigation)
                     ARM_TO_STRING(ARM_2D_VERSION_MINOR)
                     "."
                     ARM_TO_STRING(ARM_2D_VERSION_PATCH)
-                    "-"
+                    " "
                     ARM_2D_VERSION_STR
                     );
 #endif
-
-    arm_2d_op_wait_async(NULL);
+#endif
+    ARM_2D_OP_WAIT_ASYNC();
 
     return arm_fsm_rt_cpl;
 }
@@ -218,8 +372,8 @@ IMPL_PFB_ON_LOW_LV_RENDERING(__disp_adapter0_pfb_render_handler)
 {
     const arm_2d_tile_t *ptTile = &(ptPFB->tTile);
 
-    ARM_2D_UNUSED(pTarget);
-    ARM_2D_UNUSED(bIsNewFrame);
+    ARM_2D_PARAM(pTarget);
+    ARM_2D_PARAM(bIsNewFrame);
 
     if (__arm_2d_helper_3fb_draw_bitmap(&s_tDirectModeHelper,
                                         ptPFB)) {
@@ -279,8 +433,8 @@ IMPL_PFB_ON_LOW_LV_RENDERING(__disp_adapter0_pfb_render_handler)
 {
     const arm_2d_tile_t *ptTile = &(ptPFB->tTile);
 
-    ARM_2D_UNUSED(pTarget);
-    ARM_2D_UNUSED(bIsNewFrame);
+    ARM_2D_PARAM(pTarget);
+    ARM_2D_PARAM(bIsNewFrame);
 
     /* request an asynchronous flushing */
     __disp_adapter0_request_async_flushing(
@@ -300,15 +454,13 @@ IMPL_PFB_ON_LOW_LV_RENDERING(__disp_adapter0_pfb_render_handler)
  * Meanwhile, in developing stage, this method can ensure a robust flushing. 
  */
 
-
-
 __WEAK
 IMPL_PFB_ON_LOW_LV_RENDERING(__disp_adapter0_pfb_render_handler)
 {
     const arm_2d_tile_t *ptTile = &(ptPFB->tTile);
 
-    ARM_2D_UNUSED(pTarget);
-    ARM_2D_UNUSED(bIsNewFrame);
+    ARM_2D_PARAM(pTarget);
+    ARM_2D_PARAM(bIsNewFrame);
 
     Disp0_DrawBitmap(ptTile->tRegion.tLocation.iX,
                     ptTile->tRegion.tLocation.iY,
@@ -324,7 +476,7 @@ IMPL_PFB_ON_LOW_LV_RENDERING(__disp_adapter0_pfb_render_handler)
 
 static bool __on_each_frame_complete(void *ptTarget)
 {
-    ARM_2D_UNUSED(ptTarget);
+    ARM_2D_PARAM(ptTarget);
     
     int64_t lTimeStamp = arm_2d_helper_get_system_timestamp();
     
@@ -392,7 +544,7 @@ static bool __on_each_frame_complete(void *ptTarget)
                         (int32_t)arm_2d_helper_convert_ticks_to_ms(DISP0_ADAPTER.Benchmark.wLCDLatency)
                     );
                 }
-
+                 
                 DISP0_ADAPTER.Benchmark.wMin = UINT32_MAX;
                 DISP0_ADAPTER.Benchmark.wMax = 0;
                 DISP0_ADAPTER.Benchmark.dwTotal = 0;
@@ -407,6 +559,7 @@ static bool __on_each_frame_complete(void *ptTarget)
     
     return true;
 }
+
 
 #if __DISP0_CFG_ROTATE_SCREEN__
 /*!
@@ -465,10 +618,10 @@ static void __user_scene_player_init(void)
 
     //! initialise FPB helper
     if (ARM_2D_HELPER_PFB_INIT(
-        &DISP0_ADAPTER.use_as__arm_2d_helper_pfb_t,                    //!< FPB Helper object
+        &DISP0_ADAPTER.use_as__arm_2d_helper_pfb_t,                            //!< FPB Helper object
         __DISP0_CFG_SCEEN_WIDTH__,                                     //!< screen width
         __DISP0_CFG_SCEEN_HEIGHT__,                                    //!< screen height
-        COLOUR_INT,                                                    //!< colour date type
+        COLOUR_INT,                                                             //!< colour date type
         __DISP0_COLOUR_FORMAT__,                                       //!< colour format
         __DISP0_CFG_PFB_BLOCK_WIDTH__,                                 //!< PFB block width
         __DISP0_CFG_PFB_BLOCK_HEIGHT__,                                //!< PFB block height
@@ -476,7 +629,7 @@ static void __user_scene_player_init(void)
 
 #if     __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__                          \
     &&  !__DISP0_CFG_USE_HEAP_FOR_VIRTUAL_RESOURCE_HELPER__
-        + 3 
+        + __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__ - 1
 #else
         + (__DISP0_CFG_ROTATE_SCREEN__ > 0)
 #endif
@@ -504,8 +657,8 @@ static void __user_scene_player_init(void)
         .FrameBuffer.u3PixelHeightAlign = __DISP0_CFG_PFB_PIXEL_ALIGN_HEIGHT__,
 #if     __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__                          \
     &&  !__DISP0_CFG_USE_HEAP_FOR_VIRTUAL_RESOURCE_HELPER__
-        // reserve 3 PFB blocks for the virtual resource service
-        .FrameBuffer.u4PoolReserve = 3, 
+        // reserve PFB blocks for the virtual resource service
+        .FrameBuffer.u4PoolReserve = __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__ - 1,
 #endif
 #if __DISP0_CFG_OPTIMIZE_DIRTY_REGIONS__
         .DirtyRegion.ptRegions = s_tDirtyRegionList,
@@ -563,10 +716,24 @@ static void __user_scene_player_init(void)
     DISP0_ADAPTER.Benchmark.hwFrameCounter = 0;
 }
 
-#if !__DISP0_CFG_DISABLE_NAVIGATION_LAYER__
+#if __DISP0_CFG_NAVIGATION_LAYER_MODE__
 __WEAK 
 void disp_adapter0_navigator_init(void)
 {
+#if __DISP0_CFG_NAVIGATION_LAYER_MODE__ == 2
+    
+    static const arm_2d_region_t tScreen = {
+        .tSize = {
+            .iWidth = __DISP0_CFG_SCEEN_WIDTH__,
+            .iHeight = __DISP0_CFG_SCEEN_HEIGHT__,
+        },
+    };
+    
+    arm_2d_align_bottom_centre(tScreen, s_tNavDirtyRegionList[0].tRegion.tSize) {
+        s_tNavDirtyRegionList[0].tRegion = __bottom_centre_region;
+        s_tNavDirtyRegionList[0].tRegion.tLocation.iY -= 16;
+    }
+#else
     /*! define dirty regions for the navigation layer */
     IMPL_ARM_2D_REGION_LIST(s_tNavDirtyRegionList, static)
 
@@ -581,7 +748,69 @@ void disp_adapter0_navigator_init(void)
             },
         ),
 
-    END_IMPL_ARM_2D_REGION_LIST()
+    END_IMPL_ARM_2D_REGION_LIST(s_tNavDirtyRegionList)
+#endif
+
+#if __DISP0_CFG_USE_CONSOLE__
+    do {
+
+    #if __DISP0_CFG_CONSOLE_INPUT_BUFFER__
+        static uint8_t s_chInputBuffer[256];
+    #endif
+        static uint8_t s_chConsoleBuffer[   (__DISP0_CONSOLE_WIDTH__ / 6) 
+                                        *   (__DISP0_CONSOLE_HEIGHT__ / 8)];
+        console_box_cfg_t tCFG = {
+            .tBoxSize = {
+                .iWidth = __DISP0_CONSOLE_WIDTH__, 
+                .iHeight = __DISP0_CONSOLE_HEIGHT__,
+            },
+
+            .pchConsoleBuffer = s_chConsoleBuffer,
+            .hwConsoleBufferSize = sizeof(s_chConsoleBuffer),
+
+        #if __DISP0_CFG_CONSOLE_INPUT_BUFFER__
+            .pchInputBuffer = s_chInputBuffer,
+            .hwInputBufferSize = sizeof(s_chInputBuffer),
+        #endif
+
+        #if __DISP0_CFG_COLOUR_DEPTH__ == 8
+            .tColor = GLCD_COLOR_WHITE,
+        #else
+            .tColor = GLCD_COLOR_GREEN,
+        #endif
+            
+            .bUseDirtyRegion = true,
+            .ppDirtyRegionList = (arm_2d_region_list_item_t **)&s_tNavDirtyRegionList,
+        };
+
+        console_box_init(   &DISP0_CONSOLE.tConsole, 
+                            NULL, 
+                            &tCFG);
+    } while(0);
+
+    arm_2d_dirty_region_item_ignore_set(&DISP0_CONSOLE.tBackground, true);
+    
+    arm_2d_region_t tScreen = {
+        .tSize = {
+            __DISP0_CFG_SCEEN_WIDTH__, 
+            __DISP0_CFG_SCEEN_HEIGHT__
+        },
+    };
+
+    arm_2d_align_top_left(tScreen, 220, 200) {
+        DISP0_CONSOLE.tBackground.tRegion = __top_left_region;
+    }
+
+    arm_2d_helper_pfb_append_dirty_regions_to_list(
+                                (arm_2d_region_list_item_t **)&s_tNavDirtyRegionList,
+                                &DISP0_CONSOLE.tBackground,
+                                1);
+ 
+    DISP0_CONSOLE.lTimestamp = 0;
+
+    DISP0_CONSOLE.Signature = ARM_2D_VERSION;
+#endif
+
     /* register event handler for evtOnDrawNavigation */
     arm_2d_scene_player_register_on_draw_navigation_event_handler(
                     &DISP0_ADAPTER,
@@ -597,6 +826,49 @@ void disp_adapter0_navigator_init(void)
 }
 #endif
 
+#if __DISP0_CFG_USE_CONSOLE__
+
+#include <stdarg.h>
+
+#if defined(__IS_COMPILER_IAR__) && __IS_COMPILER_IAR__
+#define __va_list    va_list
+#endif
+
+ARM_NONNULL(1)
+int disp_adapter0_printf(const char *format, ...)
+{
+    int real_size, n;
+    char s_chBuffer[128];
+    char *pchSrc = s_chBuffer;
+
+    __va_list ap;
+    va_start(ap, format);
+        real_size = vsnprintf(s_chBuffer, sizeof(s_chBuffer)-1, format, ap);
+    va_end(ap);
+    real_size = MIN(sizeof(s_chBuffer)-1, real_size);
+    s_chBuffer[real_size] = '\0';
+    n = real_size;
+
+    do {
+        if (!console_box_putchar(&DISP0_CONSOLE.tConsole, *pchSrc++)) {
+            break;
+        }
+    } while(--n);
+
+    return real_size;
+}
+
+bool disp_adapter0_putchar(uint8_t chChar)
+{
+    if (DISP0_CONSOLE.Signature != ARM_2D_VERSION) {
+        return false;
+    }
+
+    return console_box_putchar(&DISP0_CONSOLE.tConsole,chChar);
+}
+
+#endif
+
 /*----------------------------------------------------------------------------*
  * Display Adapter Entry                                                      *
  *----------------------------------------------------------------------------*/
@@ -605,7 +877,14 @@ void disp_adapter0_init(void)
 {
     __user_scene_player_init();
 
+    arm_2d_helper_init();
+
+#if defined(RTE_Acceleration_Arm_2D_Extra_Controls)
+    extern
+    void arm_extra_controls_init(void);
+
     arm_extra_controls_init();
+#endif
 
     disp_adapter0_navigator_init();
 
@@ -614,7 +893,7 @@ void disp_adapter0_init(void)
     if (!__DISP0_CFG_DISABLE_DEFAULT_SCENE__) {
     #if 0
         /*! define dirty regions */
-        IMPL_ARM_2D_REGION_LIST(s_tDirtyRegions, const static)
+        IMPL_ARM_2D_REGION_LIST(s_tDirtyRegions, static)
 
             /* a region for the busy wheel */
             ADD_LAST_REGION_TO_LIST(s_tDirtyRegions,
@@ -633,6 +912,15 @@ void disp_adapter0_init(void)
     
         static arm_2d_scene_t s_tScenes[] = {
             [0] = {
+            
+            #if __DISP0_CFG_COLOR_SOLUTION__ == 1
+                /* the canvas colour */
+                .tCanvas = {GLCD_COLOR_BLACK},
+            #else
+                /* the canvas colour */
+                .tCanvas = {GLCD_COLOR_WHITE}, 
+            #endif
+        
                 .fnScene        = &__pfb_draw_handler,
                 //.ptDirtyRegion  = (arm_2d_region_list_item_t *)s_tDirtyRegions,
                 .fnOnFrameStart = &__on_frame_start,
@@ -680,10 +968,38 @@ void __disp_adapter0_free(void *pMem)
     }
 }
 
+__WEAK 
+void __disp_adapter0_vres_asset_2dcopy( uintptr_t pObj,
+                                        arm_2d_vres_t *ptVRES,
+                                        arm_2d_region_t *ptRegion,
+                                        uintptr_t pSrc,
+                                        uintptr_t pDes,
+                                        int16_t iTargetStride,
+                                        int16_t iSourceStride,
+                                        int16_t iPixelSize)
+{
+    assert(NULL != ptRegion);
+    assert(NULL != ptVRES);
 
+    int16_t iSourceWidth = ptRegion->tSize.iWidth;
+    int16_t iSourceHeight = ptRegion->tSize.iHeight;
 
-intptr_t __disp_adapter0_vres_asset_loader (
-                                            uintptr_t pObj, 
+    /* calculate offset */
+    pSrc += (ptRegion->tLocation.iY * iSourceStride + ptRegion->tLocation.iX) * iPixelSize;
+    
+    for (int_fast16_t y = 0; y < iSourceHeight; y++) {
+        __disp_adapter0_vres_read_memory( 
+                                        pObj, 
+                                        (void *)pDes, 
+                                        (uintptr_t)pSrc, 
+                                        iPixelSize * iSourceWidth);
+        
+        pDes += iTargetStride * iPixelSize;
+        pSrc += iSourceStride * iPixelSize;
+    }
+}
+
+intptr_t __disp_adapter0_vres_asset_loader (uintptr_t pObj, 
                                             arm_2d_vres_t *ptVRES, 
                                             arm_2d_region_t *ptRegion)
 {
@@ -707,7 +1023,32 @@ intptr_t __disp_adapter0_vres_asset_loader (
             nBytesPerLine = (nBitsPerLine + 7) >> 3;
         }
     }
+
+    /* background load mode */
+    do {
+        if (ptVRES->tTile.tInfo.u3ExtensionID != ARM_2D_TILE_EXTENSION_VRES) {
+            break;
+        }
+
+        assert ((uintptr_t)NULL != ptVRES->tTile.nAddress);
+
+        uintptr_t pSrc = __disp_adapter0_vres_get_asset_address(pObj, ptVRES);
+        uintptr_t pDes = (uintptr_t)ptVRES->tTile.nAddress;
+        int16_t iTargetStride = ptVRES->tTile.tInfo.Extension.VRES.iTargetStride;
+        int16_t iSourceStride = ptVRES->tTile.tRegion.tSize.iWidth;
     
+        __disp_adapter0_vres_asset_2dcopy(  pObj, 
+                                            ptVRES, 
+                                            ptRegion, 
+                                            pSrc, 
+                                            pDes, 
+                                            iTargetStride, 
+                                            iSourceStride, 
+                                            nPixelSize);
+
+        return ptVRES->tTile.nAddress;
+    } while(0);
+
     /* default condition */
     tBufferSize = ptRegion->tSize.iHeight * nBytesPerLine;
     
@@ -758,19 +1099,14 @@ intptr_t __disp_adapter0_vres_asset_loader (
         int16_t iTargetStride = ptRegion->tSize.iWidth;
         int16_t iSourceStride = ptVRES->tTile.tRegion.tSize.iWidth;
 
-        /* calculate offset */
-        pSrc += (ptRegion->tLocation.iY * iSourceStride + ptRegion->tLocation.iX) * nPixelSize;
-        
-        for (int_fast16_t y = 0; y < ptRegion->tSize.iHeight; y++) {
-            __disp_adapter0_vres_read_memory( 
-                                            pObj, 
-                                            (void *)pDes, 
-                                            (uintptr_t)pSrc, 
-                                            nPixelSize * iTargetStride);
-            
-            pDes += iTargetStride * nPixelSize;
-            pSrc += iSourceStride * nPixelSize;
-        }
+        __disp_adapter0_vres_asset_2dcopy(  pObj, 
+                                            ptVRES, 
+                                            ptRegion, 
+                                            pSrc, 
+                                            pDes, 
+                                            iTargetStride, 
+                                            iSourceStride, 
+                                            nPixelSize);
     } while(0);
     
     return (intptr_t)pBuffer;

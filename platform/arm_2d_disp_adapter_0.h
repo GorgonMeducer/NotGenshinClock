@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009-2021 Arm Limited. All rights reserved.
+ * Copyright (c) 2009-2024 Arm Limited. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -19,12 +19,9 @@
 #ifndef __ARM_2D_DISP_ADAPTER0_H__
 #define __ARM_2D_DISP_ADAPTER0_H__
 
-#include "arm_2d.h"
+#include "arm_2d_helper.h"
 
 #ifdef RTE_Acceleration_Arm_2D_Helper_Disp_Adapter0
-
-#include "arm_2d_helper_scene.h"
-#include "__common.h"
 
 #ifdef   __cplusplus
 extern "C" {
@@ -43,40 +40,69 @@ extern "C" {
 /*============================ MACROS ========================================*/
 
 //-------- <<< Use Configuration Wizard in Context Menu >>> -----------------
-//
+
+// <h>Screen and Framebuffer
+// =======================
+
+// <o> Select the screen colour solution
+//     <0=>     None
+//     <1=>     Monochrome
+// <i> When specifying a colour solution, the __DISP0_CFG_COLOUR_DEPTH__ and other corresponding options will be configured (overriden) accordingly.
+#ifndef __DISP0_CFG_COLOR_SOLUTION__
+#   define __DISP0_CFG_COLOR_SOLUTION__                            0
+#endif
+
 // <o> Select the screen colour depth
 //     <8=>     8 Bits
 //     <16=>    16Bits
 //     <32=>    32Bits
 // <i> The colour depth of your screen
 #ifndef __DISP0_CFG_COLOUR_DEPTH__
-#   define __DISP0_CFG_COLOUR_DEPTH__                              16
+#   define __DISP0_CFG_COLOUR_DEPTH__                              __GLCD_CFG_COLOUR_DEPTH__
 #endif
 
 // <o>Width of the screen <8-32767>
 // <i> The width of your screen
 // <i> Default: 320
 #ifndef __DISP0_CFG_SCEEN_WIDTH__
-#   define __DISP0_CFG_SCEEN_WIDTH__                               800
+#   define __DISP0_CFG_SCEEN_WIDTH__                               __GLCD_CFG_SCEEN_WIDTH__
 #endif
 
 // <o>Height of the screen <8-32767>
 // <i> The height of your screen
 // <i> Default: 240
 #ifndef __DISP0_CFG_SCEEN_HEIGHT__
-#   define __DISP0_CFG_SCEEN_HEIGHT__                              480
+#   define __DISP0_CFG_SCEEN_HEIGHT__                              __GLCD_CFG_SCEEN_HEIGHT__
+#endif
+
+/*
+  ARM_SCREEN_NO_ROTATION   0
+  ARM_SCREEN_ROTATE_90     1
+  ARM_SCREEN_ROTATE_180    2
+  ARM_SCREEN_ROTATE_270    3
+ */
+
+// <o>Rotate the Screen
+//     <0=>  NO Rotation
+//     <1=>    90 Degree
+//     <2=>   180 Degree
+//     <3=>   270 Degree
+// <i> Rotate the Screen for specified degrees.
+// <i> NOTE: This is extremely slow. Please avoid using it whenever it is possible.
+#ifndef __DISP0_CFG_ROTATE_SCREEN__
+#   define __DISP0_CFG_ROTATE_SCREEN__                             0
 #endif
 
 // <o>Width of the PFB block
 // <i> The width of your PFB block size used in disp0
 #ifndef __DISP0_CFG_PFB_BLOCK_WIDTH__
-#   define __DISP0_CFG_PFB_BLOCK_WIDTH__                           800
+#   define __DISP0_CFG_PFB_BLOCK_WIDTH__                           __DISP0_CFG_SCEEN_WIDTH__
 #endif
 
 // <o>Height of the PFB block
 // <i> The height of your PFB block size used in disp0
 #ifndef __DISP0_CFG_PFB_BLOCK_HEIGHT__
-#   define __DISP0_CFG_PFB_BLOCK_HEIGHT__                          480
+#   define __DISP0_CFG_PFB_BLOCK_HEIGHT__                          (__DISP0_CFG_SCEEN_HEIGHT__ / 10)
 #endif
 
 // <o>Width Alignment of generated PFBs
@@ -90,7 +116,7 @@ extern "C" {
 //     <7=>   128 pixel
 // <i> Make sure the x and width of the PFB is always aligned to 2^n pixels
 #ifndef __DISP0_CFG_PFB_PIXEL_ALIGN_WIDTH__
-#   define __DISP0_CFG_PFB_PIXEL_ALIGN_WIDTH__                     0
+#   define __DISP0_CFG_PFB_PIXEL_ALIGN_WIDTH__                     1
 #endif
 
 // <o>Height Alignment of generated PFBs
@@ -113,10 +139,25 @@ extern "C" {
 #   define __DISP0_CFG_PFB_HEAP_SIZE__                             1
 #endif
 
+// </h>
+
+// <h>Navigation Layer
+// =======================
+
+// <o>Navigation Layer Mode
+//     <0=>     Disable Navigation Layer
+//     <1=>     Normal Mode (Bottom)
+//     <2=>     Tiny Mode (Bottom Centre)
+// <i> Configure the default navigation layer of this display adapter. 
+// <i> NOTE: Disable the navigation layer will also remove the real-time FPS display.
+#ifndef __DISP0_CFG_NAVIGATION_LAYER_MODE__
+#   define __DISP0_CFG_NAVIGATION_LAYER_MODE__                      0
+#endif
+
 // <o>Number of iterations <0-2000>
 // <i> run number of iterations before calculate the FPS.
 #ifndef __DISP0_CFG_ITERATION_CNT__
-#   define __DISP0_CFG_ITERATION_CNT__                             30
+#   define __DISP0_CFG_ITERATION_CNT__                              30
 #endif
 
 // <o>FPS Calculation Mode
@@ -124,8 +165,32 @@ extern "C" {
 //     <1=>     Real FPS
 // <i> Decide the meaning of the real time FPS display
 #ifndef __DISP0_CFG_FPS_CACULATION_MODE__
-#   define __DISP0_CFG_FPS_CACULATION_MODE__                       1
+#   define __DISP0_CFG_FPS_CACULATION_MODE__                        1
 #endif
+
+// <q> Enable Console
+// <i> Add a simple console to the display adapter in a floating window.
+// <i> This feature is disabled by default.
+#ifndef __DISP0_CFG_USE_CONSOLE__
+#   define __DISP0_CFG_USE_CONSOLE__                                0
+#endif
+
+// <o> Console Input Buffer Size
+// <i> The size of console input buffer, 0 means no input buffer
+#ifndef __DISP0_CFG_CONSOLE_INPUT_BUFFER__
+#   define __DISP0_CFG_CONSOLE_INPUT_BUFFER__                       255
+#endif
+
+// <o> Console Display Time in ms <1000-0xFFFFFFFF>
+// <i> The time before the console disappear for each content update.
+#ifndef __DISP0_CFG_CONSOLE_DISPALY_TIME__
+#   define __DISP0_CFG_CONSOLE_DISPALY_TIME__                       3000
+#endif
+
+// </h>
+
+// <h>Optimization and Misc
+// =======================
 
 // <q> Enable Dirty Region Debug Mode
 // <i> Draw dirty regions on the screen for debug.
@@ -151,16 +216,6 @@ extern "C" {
 #   define __DISP0_CFG_SWAP_RGB16_HIGH_AND_LOW_BYTES__             0
 #endif
 
-// <o>Rotate the Screen
-//     <0=>    NO Rotate
-//     <1=>    90 Degree
-//     <2=>   180 Degree
-//     <3=>   270 Degree
-// <i> Rotate the Screen for specified degrees.
-#ifndef __DISP0_CFG_ROTATE_SCREEN__
-#   define __DISP0_CFG_ROTATE_SCREEN__                             0
-#endif
-
 // <q>Enable the helper service for Asynchronous Flushing
 // <i> Please select this option when using asynchronous flushing, e.g. DMA + ISR 
 #ifndef __DISP0_CFG_ENABLE_ASYNC_FLUSHING__
@@ -170,7 +225,7 @@ extern "C" {
 // <q>Enable the helper service for 3FB (LCD Direct Mode)
 // <i> You can select this option when your LCD controller supports direct mode
 #ifndef __DISP0_CFG_ENABLE_3FB_HELPER_SERVICE__
-#   define __DISP0_CFG_ENABLE_3FB_HELPER_SERVICE__                 0
+#   define __DISP0_CFG_ENABLE_3FB_HELPER_SERVICE__                 1
 #endif
 
 // <q>Disable the default scene
@@ -179,17 +234,17 @@ extern "C" {
 #   define __DISP0_CFG_DISABLE_DEFAULT_SCENE__                     0
 #endif
 
-// <q>Disable the navigation layer
-// <i> Remove the navigation layer for this display adapter. NOTE: Disable the navigation layer will also remove the real-time FPS display.
-#ifndef __DISP0_CFG_DISABLE_NAVIGATION_LAYER__
-#   define __DISP0_CFG_DISABLE_NAVIGATION_LAYER__                  0
-#endif
-
-// <q>Enable the virtual resource helper service
+// <o>Maximum number of Virtual Resources used per API
+//     <0=>     NO Virtual Resource
+//     <1=>     Background Loading Mode
+//     <2=>     1 Per API
+//     <3=>     2 Per API
+//     <4=>     3 Per API
 // <i> Introduce a helper service for loading virtual resources.
 // <i> This feature is disabled by default.
+// <i> NOTE: When selecting the background loading mode, you can ONLY use virtual resource as the source tile in the tile-copy-only APIs. 
 #ifndef __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__
-#   define __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__                   0
+#   define __DISP0_CFG_VIRTUAL_RESOURCE_HELPER__                   2
 #endif
 
 // <q>Use heap to allocate buffer in the virtual resource helper service
@@ -198,8 +253,16 @@ extern "C" {
 #ifndef __DISP0_CFG_USE_HEAP_FOR_VIRTUAL_RESOURCE_HELPER__
 #   define __DISP0_CFG_USE_HEAP_FOR_VIRTUAL_RESOURCE_HELPER__      0
 #endif
+
+// </h>
+
 // <<< end of configuration section >>>
 
+#if __DISP0_CFG_COLOR_SOLUTION__ == 1
+/* the colour solution for monochrome screen */
+#   undef __DISP0_CFG_COLOUR_DEPTH__
+#   define __DISP0_CFG_COLOUR_DEPTH__                               8
+#endif
 
 #ifndef __DISP0_COLOUR_FORMAT__
 #   if      __DISP0_CFG_COLOUR_DEPTH__ == 8
@@ -467,6 +530,19 @@ void disp_adapter0_insert_async_flushing_complete_event_handler(void);
 extern
 void *disp_adapter0_3fb_get_flush_pointer(void);
 
+#endif
+
+
+#if __DISP0_CFG_USE_CONSOLE__
+extern
+ARM_NONNULL(1)
+int disp_adapter0_printf(const char *format, ...);
+
+extern
+bool disp_adapter0_putchar(uint8_t chChar);
+#else
+#   define disp_adapter0_printf(__format_string, ...)
+#   define disp_adapter0_putchar(...)           (true)
 #endif
 
 #if defined(__clang__)

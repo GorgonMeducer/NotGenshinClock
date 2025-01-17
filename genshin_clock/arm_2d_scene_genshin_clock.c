@@ -23,7 +23,6 @@
 #include "arm_2d_scene_genshin_clock.h"
 
 #include "arm_2d_helper.h"
-#include "arm_extra_controls.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -288,8 +287,7 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_genshin_clock_handler)
     arm_2d_canvas(ptTile, __top_canvas) {
     /*-----------------------draw the foreground begin-----------------------*/
         
-        arm_2d_fill_colour(ptTile, NULL, GLCD_COLOR_BLACK);
-
+        arm_2d_fill_colour(ptTile, &__top_canvas, GLCD_COLOR_BLACK);
 
         /* draw background */
         arm_using(arm_2d_region_t __background_canvas = __top_canvas) {
@@ -323,77 +321,76 @@ IMPL_PFB_ON_DRAW(__pfb_draw_scene_genshin_clock_handler)
                                     ptTile,
                                     &__background_canvas);
             
-            arm_2d_op_wait_async(NULL);
+            ARM_2D_OP_WAIT_ASYNC();
 
         }
 
-        arm_2d_align_mid_right(__top_canvas, c_tileClockGradientPanelMask.tRegion.tSize) {
-            arm_2d_fill_colour_with_mask_and_opacity(   
-                                                ptTile, 
-                                                &__mid_right_region, 
-                                                &c_tileClockGradientPanelMask, 
-                                                (__arm_2d_color_t){GLCD_COLOR_BLACK},
-                                                128);
-        }
+        arm_2d_layout(__top_canvas, RIGHT_TO_LEFT) {
 
+            __item_line_dock_horizontal(c_tileGenshinClockPanelMask.tRegion.tSize.iWidth) {
 
-        /* draw the cmsis logo using mask in the centre of the screen */
-        arm_2d_align_mid_right(__top_canvas, c_tileGenshinClockPanelMask.tRegion.tSize) {
+                arm_2d_fill_colour_with_opacity(
+                    ptTile,
+                    &__item_region,
+                    (__arm_2d_color_t){GLCD_COLOR_BLACK},
+                    128);
+                
+                ARM_2D_OP_WAIT_ASYNC();
 
-            arm_2d_align_centre(__mid_right_region, c_tileClockInnerPanelMask.tRegion.tSize) {
-                    arm_2d_tile_copy_with_src_mask_only(&s_tileInnerPanel, 
-                                                        &c_tileClockInnerPanelMask,
-                                                        ptTile, 
-                                                        &__centre_region);
-            }
-            
-            arm_2d_op_wait_async(NULL);
-
-
-            
-            arm_2d_fill_colour_with_mask_and_opacity(   
-                                                ptTile, 
-                                                &__mid_right_region, 
-                                                &c_tileGenshinClockPanelMask, 
-                                                (__arm_2d_color_t){__RGB(255, 255, 128)},
-                                                256 - 64);
-
-            arm_2d_op_wait_async(NULL);
-
-
-            arm_2d_align_centre(__mid_right_region, c_tileClockInnerPanelMask.tRegion.tSize) {
-                static const arm_2d_location_t tSourceCentre = {17, 90};
-
-                if (arm_2d_helper_time_liner_slider(0, 3600, 60 * 1000, &iResult, &this.lTimestamp[TRANSFORM_POINTER_0])) {
-                    this.lTimestamp[TRANSFORM_POINTER_0] = 0;
+                arm_2d_align_centre(__item_region, c_tileClockInnerPanelMask.tRegion.tSize) {
+                        arm_2d_tile_copy_with_src_mask_only(&s_tileInnerPanel, 
+                                                            &c_tileClockInnerPanelMask,
+                                                            ptTile, 
+                                                            &__centre_region);
                 }
-                fAngle = ARM_2D_ANGLE((float)iResult / 10.0f);
+                
+                ARM_2D_OP_WAIT_ASYNC();
 
-                arm_2dp_fill_colour_with_mask_opacity_and_transform(&this.tTransformOP[TRANSFORM_POINTER_0],
-                                                                    &c_tileGenshinPointerMask,
-                                                                    ptTile,
-                                                                    &__centre_region,
-                                                                    tSourceCentre,
-                                                                    fAngle,
-                                                                    1.0f,
-                                                                    __RGB(255, 255, 128),
-                                                                    255);
+                arm_2d_fill_colour_with_mask_and_opacity(   
+                                                    ptTile, 
+                                                    &__item_region, 
+                                                    &c_tileGenshinClockPanelMask, 
+                                                    (__arm_2d_color_t){__RGB(255, 255, 128)},
+                                                    256 - 64);
+
+                ARM_2D_OP_WAIT_ASYNC();
+
+                arm_2d_align_centre(__item_region, c_tileClockInnerPanelMask.tRegion.tSize) {
+                    static const arm_2d_location_t tSourceCentre = {17, 90};
+
+                    if (arm_2d_helper_time_liner_slider(0, 3600, 60 * 1000, &iResult, &this.lTimestamp[TRANSFORM_POINTER_0])) {
+                        this.lTimestamp[TRANSFORM_POINTER_0] = 0;
+                    }
+                    fAngle = ARM_2D_ANGLE((float)iResult / 10.0f);
+
+                    arm_2dp_fill_colour_with_mask_opacity_and_transform(&this.tTransformOP[TRANSFORM_POINTER_0],
+                                                                        &c_tileGenshinPointerMask,
+                                                                        ptTile,
+                                                                        &__centre_region,
+                                                                        tSourceCentre,
+                                                                        fAngle,
+                                                                        1.0f,
+                                                                        __RGB(255, 255, 128),
+                                                                        255);
+                }
+            }
+
+            __item_line_dock_horizontal(64) {
+
+                arm_2d_fill_colour_with_horizontal_alpha_gradient(
+                    ptTile,
+                    &__item_region,
+                    (__arm_2d_color_t){GLCD_COLOR_BLACK}, 
+                    (arm_2d_alpha_samples_2pts_t) {
+                        {0, 128},
+                    });
+
             }
         }
-
-
-        /* draw text at the top-left corner */
-
-        arm_lcd_text_set_target_framebuffer((arm_2d_tile_t *)ptTile);
-        arm_lcd_text_set_font(&ARM_2D_FONT_6x8.use_as__arm_2d_font_t);
-        arm_lcd_text_set_draw_region(NULL);
-        arm_lcd_text_set_colour(GLCD_COLOR_RED, GLCD_COLOR_WHITE);
-        arm_lcd_text_location(0,0);
-        arm_lcd_puts("Scene genshin_clock");
 
     /*-----------------------draw the foreground end  -----------------------*/
     }
-    arm_2d_op_wait_async(NULL);
+    ARM_2D_OP_WAIT_ASYNC();
 
     return arm_fsm_rt_cpl;
 }

@@ -22,8 +22,8 @@
  * Description:  Public header file for porting Arm-2D to an non-supported
  *               Architecture. 
  *
- * $Date:        4 Aug 2023
- * $Revision:    V.1.0.0
+ * $Date:        20 Sept 2024
+ * $Revision:    V.1.1.0
  *
  * -------------------------------------------------------------------- */
 
@@ -59,27 +59,29 @@
 
 #undef arm_irq_safe
 #undef arm_exit_irq_safe
-#define arm_irq_safe  arm_using(  uint32_t ARM_2D_SAFE_NAME(temp) = 0 )
+#define arm_irq_safe  arm_using( uint32_t ARM_2D_SAFE_NAME(temp) = 0,         \
+                                 {  ARM_2D_UNUSED(ARM_2D_SAFE_NAME(temp));    \
+                                    VT_enter_global_mutex();},                \
+                                 {  VT_leave_global_mutex();} )
 #define arm_exit_irq_safe    continue
 
 
 /**
   \brief   Reverse byte order (16 bit)
   \details Reverses the byte order within each halfword of a word. For example, 0x12345678 becomes 0x34127856.
-  \param [in]    value  Value to reverse
+  \param [in]    wValue  the two half words to reverse
   \return               Reversed value
  */
-__STATIC_FORCEINLINE uint32_t __REV16(uint32_t value)
+__STATIC_FORCEINLINE uint32_t __REV16(uint32_t wValue)
 {
-    uint16_t a,b;
-    uint32_t ret;
-    a=value&0xFFFF;
-    b=(value>>16)&0xFFFF;
-    ret=a;
-    ret=(ret<<16)&0xFFFF;
-    ret+=b;
-    return ret;
+    uint32_t wHigh = wValue & 0xFF00FF00;
+    uint32_t wLow = wValue & 0x00FF00FF;
+
+    return (wHigh >> 8) | (wLow << 8);
 }
+
+extern void VT_enter_global_mutex(void);
+extern void VT_leave_global_mutex(void);
 
 
 #endif  /* end of __ARM_2D_USER_ARCH_PORT_H__ */
